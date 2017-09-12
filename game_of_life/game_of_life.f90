@@ -8,7 +8,7 @@ program conways_game_of_life
 
   ! get input from command line
   print *, 'Enter ngrid, nsamples'
-  read *, n, samples
+  read(11, *) n, samples
 
   print *, 'ngrid=', n
   print *, 'samples=', samples
@@ -38,6 +38,7 @@ contains
     integer i, j
     integer n
     ! fortran is column major, so first dimension is contiguous in memory
+    !$omp parallel do private(i,j,n)
     do j=1,ubound(f,2)-1
        do i=1,ubound(f,1)-1
           n = sum(f(i-1:i+1,j-1:j+1)) - 1
@@ -51,6 +52,7 @@ contains
           end select
        end do
     end do
+    !$omp end parallel do
 
   end subroutine advance
 
