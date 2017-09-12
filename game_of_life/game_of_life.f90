@@ -1,6 +1,7 @@
 ! See Conways game of life on wikipedia
 ! https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
 program conways_game_of_life
+  use redis_mod
   implicit none
   integer, parameter :: ALIVE=1, DEAD=0
   integer, allocatable :: f(:,:), g(:,:)
@@ -86,10 +87,5 @@ contains
     end do
 
   end subroutine init
-
-  subroutine stream_data(f)
-    integer f(:,:)
-    ! TODO this is a function stub
-  end subroutine stream_data
 
 end program

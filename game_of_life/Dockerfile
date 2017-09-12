@@ -4,6 +4,7 @@ MAINTAINER Noah Brenowitz
 RUN apt-get update  && apt-get -y upgrade 
 #RUN apt-get install -y build-essential
 RUN apt-get install -y gfortran mpich gcc-5 make
+RUN apt-get install -y redis
 
 WORKDIR /root
 
