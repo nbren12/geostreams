@@ -62,3 +62,6 @@ void publish_to_redis_(int* f, int* nptr , int* mptr){
   redisFree(c);
 
 }
+
+void iarray_to_redis(int *f, int* dims, int* ndims_ptr){
+}
