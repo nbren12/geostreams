@@ -5,6 +5,7 @@
 #include <hiredis.h>
 // did brew install hiredis
 
+const int num_buffer = 100;
 
 redisContext * setupConnection(){
 
@@ -49,6 +50,10 @@ void publish_to_redis_(int* f, int* nptr , int* mptr){
   len = sizeof(f) * m * n;
   printf("Len is  %i", (int) len);
   reply = redisCommand(c,"LPUSH A %b", buf, len);
+
+  // trim data
+  reply = redisCommand(c, "LTRIM A 0 %d", num_buffer);
+  printf("%s\n",  reply->str);
   freeReplyObject(reply);
 
 }
