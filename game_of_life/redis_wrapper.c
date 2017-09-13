@@ -12,8 +12,10 @@ redisContext * setupConnection(){
   redisContext *c;
   redisReply *reply;
   const char *hostname = "127.0.0.1";
+  char*  pass;
   int port = 6379;
 
+  pass = getenv("PASS");
 
   struct timeval timeout = { 1, 500000 }; // 1.5 seconds
   c = redisConnectWithTimeout(hostname, port, timeout);
@@ -26,6 +28,8 @@ redisContext * setupConnection(){
     }
     exit(1);
   }
+  redisCommand(c, "AUTH %s", pass);
+  
 
   return c;
 }
@@ -44,16 +48,16 @@ void publish_to_redis_(int* f, int* nptr , int* mptr){
 
 
   // push data onto redis list
-  printf("Pushing array to redis\n");
+  // printf("Pushing array to redis\n");
   buf = (void *) f;
   size_t len;
   len = sizeof(f) * m * n;
-  printf("Len is  %i", (int) len);
+  // printf("Len is  %i", (int) len);
   reply = redisCommand(c,"LPUSH A %b", buf, len);
 
   // trim data
   reply = redisCommand(c, "LTRIM A 0 %d", num_buffer);
-  printf("%s\n",  reply->str);
+  // printf("%s\n",  reply->str);
   freeReplyObject(reply);
 
 }

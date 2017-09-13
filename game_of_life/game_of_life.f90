@@ -21,14 +21,17 @@ program conways_game_of_life
   call init(f)
 
   ! time loop
-  do t=1,samples
+  t = 0
+  do while ((t < samples ) .or. ( samples < 0))
      call stream_data(f)
      call periodic_bc(f, 1)
      call advance(f, g)
+     t = t + 1
 
      call stream_data(g)
      call periodic_bc(g, 1)
      call advance(g, f)
+     t = t + 1
   end do
 
   call stream_data(f)
