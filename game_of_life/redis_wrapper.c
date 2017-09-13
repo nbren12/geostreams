@@ -51,12 +51,12 @@ void publish_to_redis_(int* f, int* nptr , int* mptr){
   // printf("Pushing array to redis\n");
   buf = (void *) f;
   size_t len;
-  len = sizeof(f) * m * n;
+  len = sizeof(f[0]) * m * n;
   // printf("Len is  %i", (int) len);
   reply = redisCommand(c,"LPUSH A %b", buf, len);
 
   // trim data
-  reply = redisCommand(c, "LTRIM A 0 %d", num_buffer);
+  reply = redisCommand(c, "LTRIM A 0 %d", num_buffer-1);
   // printf("%s\n",  reply->str);
   freeReplyObject(reply);
   redisFree(c);
