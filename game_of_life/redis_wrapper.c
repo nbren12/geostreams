@@ -59,5 +59,6 @@ void publish_to_redis_(int* f, int* nptr , int* mptr){
   reply = redisCommand(c, "LTRIM A 0 %d", num_buffer);
   // printf("%s\n",  reply->str);
   freeReplyObject(reply);
+  redisFree(c);
 
 }

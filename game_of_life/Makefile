@@ -1,6 +1,6 @@
 
 FFLAGS = -g 
-CFLAGS += -I/usr/local/include/hiredis -I/usr/include/hiredis
+CFLAGS += -I/usr/local/include/hiredis -I/usr/include/hiredis -g
 
 
 main: main.f90 redis.o redis_wrapper.o
