@@ -2,6 +2,9 @@
 LDFLAGS = -lgeostreams -L../src -lhiredis
 FFLAGS = -g  
 
+
+all : main
+
 main: main.f90 redis.o 
 	gfortran $(LDFLAGS) $(FFLAGS) -o $@ $^
 
