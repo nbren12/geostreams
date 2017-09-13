@@ -7,9 +7,11 @@
 
 const int num_buffer = 100;
 
-redisContext * setupConnection(){
+int first_run = 1;
+redisContext *c;
 
-  redisContext *c;
+void setupConnection(){
+
   redisReply *reply;
   const char *hostname = "127.0.0.1";
   char*  pass;
@@ -31,11 +33,9 @@ redisContext * setupConnection(){
   redisCommand(c, "AUTH %s", pass);
   
 
-  return c;
 }
 
 void publish_to_redis_(int* f, int* nptr , int* mptr){
-  redisContext *c;
   redisReply *reply;
   char * buf;
 
@@ -44,7 +44,11 @@ void publish_to_redis_(int* f, int* nptr , int* mptr){
   m = *mptr;
 
   // connect
-  c = setupConnection();
+  if (first_run == 1) {
+    printf("Setting up redis connection\n");
+    setupConnection();
+    first_run = 0;
+  } 
 
 
   // push data onto redis list
@@ -59,7 +63,7 @@ void publish_to_redis_(int* f, int* nptr , int* mptr){
   reply = redisCommand(c, "LTRIM A 0 %d", num_buffer-1);
   // printf("%s\n",  reply->str);
   freeReplyObject(reply);
-  redisFree(c);
+  // redisFree(c);
 
 }
 
