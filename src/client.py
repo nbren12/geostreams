@@ -8,7 +8,7 @@ from matplotlib import pyplot
 
 @contextlib.contextmanager
 def gol_connection():
-    connection = redis.StrictRedis(host=os.environ['REDIS_HOST'],
+    connection = redis.StrictRedis(host=os.environ['REDIS_URL'],
                                    port=os.environ['REDIS_PORT'],
                                    db=0,
                                    password=os.environ['REDIS_PW'])
