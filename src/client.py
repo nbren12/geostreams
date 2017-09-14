@@ -43,4 +43,4 @@ def read_gol():
             pyplot.imshow(array)
             pyplot.savefig('scene.png')
         else:
-            print 'No key `A`.'
+            print('No key `A`.')
