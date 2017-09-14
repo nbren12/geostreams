@@ -2,6 +2,7 @@
 FFLAGS = -g 
 CFLAGS += -I/usr/local/include/hiredis -I/usr/include/hiredis -g
 
+all: game_of_life
 
 main: main.f90 redis.o redis_wrapper.o
 	gfortran -lhiredis $(FFLAGS) -o $@ $^
