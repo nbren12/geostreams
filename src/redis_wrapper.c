@@ -92,13 +92,14 @@ void iarray_to_redis(int *f, int* dims, int* ndims_ptr){
   redisReply *reply;
   char * buf;
   int ndims = *ndims_ptr;
+  int i;
 
 
   // compute length of the array
   buf = (void *) f;
   size_t len;
   len = sizeof(f[0]);
-  for (int i=0; i < ndims; i++) {
+  for (i=0; i < ndims; i++) {
     len *= (size_t) dims[i];
   }
 
