@@ -82,12 +82,10 @@ contains
 
     f = DEAD
 
-    do j=lbound(f,2),ubound(f,2)
-       do i=lbound(f,1),ubound(f,1)
-          call random_number(ran)
-          if (ran < .3) f(i,j) = ALIVE
-       end do
-    end do
+    f(2,2:4) =(/0, 0, 1/)
+    f(3,2:4) =(/1, 0, 1/)
+    f(4,2:4) =(/0, 1, 1/)
+
 
   end subroutine init
 
