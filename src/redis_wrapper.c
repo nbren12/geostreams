@@ -7,15 +7,16 @@
 
 const int num_buffer = 100;
 
-redisContext * setupConnection(){
+int first_run = 1;
+redisContext *c;
 
-  redisContext *c;
+void setupConnection(){
+
   redisReply *reply;
   const char *hostname = "127.0.0.1";
   char*  pass;
   int port = 6379;
 
-  pass = getenv("PASS");
 
   struct timeval timeout = { 1, 500000 }; // 1.5 seconds
   c = redisConnectWithTimeout(hostname, port, timeout);
@@ -28,14 +29,17 @@ redisContext * setupConnection(){
     }
     exit(1);
   }
-  redisCommand(c, "AUTH %s", pass);
-  
 
-  return c;
+
+  // Authenticate
+  pass = getenv("PASS");
+  if (pass == NULL){
+    pass = "";
+    redisCommand(c, "AUTH %s", pass);
+  }
 }
 
 void publish_to_redis_(int* f, int* nptr , int* mptr){
-  redisContext *c;
   redisReply *reply;
   char * buf;
 
@@ -44,7 +48,11 @@ void publish_to_redis_(int* f, int* nptr , int* mptr){
   m = *mptr;
 
   // connect
-  c = setupConnection();
+  if (first_run == 1) {
+    printf("Setting up redis connection\n");
+    setupConnection();
+    first_run = 0;
+  } 
 
 
   // push data onto redis list
@@ -59,9 +67,57 @@ void publish_to_redis_(int* f, int* nptr , int* mptr){
   reply = redisCommand(c, "LTRIM A 0 %d", num_buffer-1);
   // printf("%s\n",  reply->str);
   freeReplyObject(reply);
-  redisFree(c);
+  // redisFree(c);
 
 }
 
+void make_dimspec(char* dimstr, int * dims, int ndims){
+  int i, offset;
+  char k[64];
+
+  offset = 0;
+
+  i = 0;
+  sprintf(k, "%d", dims[i]);
+  strcat(dimstr, k);
+
+  for (i = 1; i < ndims; i++) {
+    sprintf(k, ",%d", dims[i]);
+    strcat(dimstr, k);
+  }
+}
+
 void iarray_to_redis(int *f, int* dims, int* ndims_ptr){
+
+  redisReply *reply;
+  char * buf;
+  int ndims = *ndims_ptr;
+  int i;
+
+
+  // compute length of the array
+  buf = (void *) f;
+  size_t len;
+  len = sizeof(f[0]);
+  for (i=0; i < ndims; i++) {
+    len *= (size_t) dims[i];
+  }
+
+  // form dim string
+  char dimspec[100];
+  make_dimspec(dimspec, dims, ndims);
+
+  if (first_run == 1) {
+    printf("Setting up redis connection\n");
+    setupConnection();
+    first_run = 0;
+  } 
+
+
+  // write message
+  reply = redisCommand(c,"HMSET A:1  messages %b dimensions %s", buf, len, dimspec);
+
+  // trim data
+  freeReplyObject(reply);
+  /* redisFree(c); */
 }

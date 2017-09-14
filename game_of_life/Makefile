@@ -15,7 +15,7 @@ redis.o : redis.f90
 gols: game_of_life game_of_life_openmp game_of_life_mpi
 
 game_of_life: game_of_life.f90 redis.o 
-	gfortran -lhiredis $(FFLAGS) -o $@ $^
+	gfortran $(LDFLAGS) $(FFLAGS) -o $@ $^
 
 game_of_life_openmp: game_of_life.f90
 	gfortran $(FFLAGS) -fopenmp -o $@ $^
