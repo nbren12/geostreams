@@ -8,10 +8,17 @@ from matplotlib import pyplot
 
 @contextlib.contextmanager
 def gol_connection():
+    try:
+        password = os.environ['REDIS_PW']
+    except KeyError:
+        password = None
+
+    print('Connecting to redis server at %s:%s' % (os.environ['REDIS_URL'],
+                                                   os.environ['REDIS_PORT']))
     connection = redis.StrictRedis(host=os.environ['REDIS_URL'],
                                    port=os.environ['REDIS_PORT'],
                                    db=0,
-                                   password=os.environ['REDIS_PW'])
+                                   password=password)
     yield connection
 
 
@@ -19,11 +26,11 @@ def gol_connection():
 # queue
 def read_from_redis(key):
     with gol_connection() as connection:
-        dimension = connection.hget(key, 'dimensions')
-        message = connection.hget(key, 'message')  # nothing returned from this yet.
+        dimension = connection.hget(key, 'dimensions').decode('utf-8')
+        message = connection.hget(key, 'messages')  # nothing returned from this yet.
 
-        x, y = tuple(float(num) for num in dimension.split(','))
-        array = numpy.fromstring(message, dtype='<i4').reshape((x, y))
+        x, y = tuple(int(num) for num in dimension.split(','))
+        array = numpy.fromstring(message, dtype='<i4').reshape((x, y), order='F')
         return array
 
 

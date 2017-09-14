@@ -2,7 +2,7 @@ import imp
 import unittest
 import uuid
 
-import numpy
+import numpy.testing
 
 
 class ArrayTest(unittest.TestCase):
@@ -12,8 +12,9 @@ class ArrayTest(unittest.TestCase):
 
         # 200 rows, 100 columns
         array = client.read_from_redis(key)
-        numpy.assert_arrays_equal(
-            numpy.tile(numpy.arange(100).reshape((100, 1)), (1, 200)),
+        x, _ = numpy.mgrid[1:201, 1:101]
+        numpy.testing.assert_array_equal(
+            x,
             array)
 
     def test_write_to_redis(self):
