@@ -1,5 +1,5 @@
 
-LDFLAGS = -lgeostreams -L../src -lhiredis
+LDFLAGS = -lgeostreams -L../src -lhiredis -I../src
 FFLAGS = -g  
 
 
