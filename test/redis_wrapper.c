@@ -33,8 +33,7 @@ void setupConnection(){
 
   // Authenticate
   pass = getenv("PASS");
-  if (pass == NULL){
-    pass = "";
+  if (pass != NULL){
     redisCommand(c, "AUTH %s", pass);
   }
 }
@@ -116,6 +115,8 @@ void iarray_to_redis(int *f, int* dims, int* ndims_ptr){
 
   // write message
   reply = redisCommand(c,"HMSET A:1  messages %b dimensions %s", buf, len, dimspec);
+  reply = redisCommand(c,"HMSET B:1  messages %b dimensions %s", buf, len, dimspec);
+  printf("wrapper-c: %s\n", reply->str);
 
   // trim data
   freeReplyObject(reply);
