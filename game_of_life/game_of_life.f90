@@ -15,7 +15,7 @@ program conways_game_of_life
   print *, 'samples=', samples
 
   ! allocate solution arrays
-  allocate(f(0:n+1,0:n+1))
+  allocate(f(n,n))
 
   call init(f, cond)
 
@@ -90,13 +90,22 @@ contains
   subroutine init(f, cond)
     integer f(:,:), i, j, cond
     real ran
+    integer window(3,3), i0, j0
     f = DEAD
     select case(cond)
     case(1)
-       f(5,5:7) = (/0, 1, 0/)
-       f(6,5:7) = (/0, 0, 1/)
-       f(7,5:7) = (/1, 1, 1/)
+       window(1,:) = (/0, 1, 0/)
+       window(2,:) = (/0, 0, 1/)
+       window(3,:) = (/1, 1, 1/)
        print *, 'Glider Condition!'
+
+       do i=1,4
+          do j=1,4
+             i0 = 10*i
+             j0 = 10*j
+             f(i0-1:i0+1,j0-1:j0+1)  = window
+          end do
+       end do
     case(2)
 
        f(5,5:7) = (/0, 1, 1/)
