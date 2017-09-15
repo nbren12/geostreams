@@ -7,7 +7,7 @@ dependencies:
 - mpich
 - xarray
 - redis
-- hiredis
 - jupyterlab
 - matplotlib=2
+- libgfortran
 - bokeh

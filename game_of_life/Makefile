@@ -1,25 +1,24 @@
 
-FFLAGS = -g 
-CFLAGS += -I/usr/local/include/hiredis -I/usr/include/hiredis -g
+INC += -I/usr/include/hiredis
+FFLAGS = -g  $(INC)
+LDFLAGS = -lhiredis -lgfortran -lgeostreams -L../src
+CFLAGS += $(INC)
 
 all: game_of_life
 
-main: main.f90 redis.o redis_wrapper.o
+main: main.f90 redis.o
 	gfortran -lhiredis $(FFLAGS) -o $@ $^
 
-redis.o : redis.f90
-	gfortran $(FFLAGS) -c $^
+%.o : %.f90
+	gfortran -c $(FFLAGS) -c $^
 
-# Target for all games of life
-gols: game_of_life game_of_life_openmp game_of_life_mpi
+game_of_life: game_of_life.f90 redis.o
+	gfortran $(FFLAGS) -o $@ $^ $(LDFLAGS)
 
-game_of_life: game_of_life.f90 redis.o redis_wrapper.o
-	gfortran -lhiredis $(FFLAGS) -o $@ $^
-
-game_of_life_openmp: game_of_life.f90
+game_of_life_openmp: game_of_life.f90 redis.o
 	gfortran $(FFLAGS) -fopenmp -o $@ $^
 
-game_of_life_mpi: game_of_life_mpi.f90
+game_of_life_mpi: game_of_life_mpi.f90 redis.o
 	mpif90 $(FFLAGS) -o $@ $<
 
 run_mpi: ./game_of_life_mpi
