@@ -53,6 +53,8 @@ void setupConnection(){
     redisCommand(c, "AUTH %s", pass);
   }
 
+  redisCommand(c, "DEL A");
+
 
 }
 

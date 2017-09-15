@@ -4,55 +4,66 @@ program conways_game_of_life
   use redis_mod
   implicit none
   integer, parameter :: ALIVE=1, DEAD=0
-  integer, allocatable :: f(:,:), g(:,:)
-  integer n, samples, t
+  integer, allocatable :: f(:,:)
+  integer n, samples, t, cond
 
   ! get input from command line
   print *, 'Enter ngrid, nsamples'
-  read(11, *) n, samples
+  read(11, *) n, samples,cond
 
   print *, 'ngrid=', n
   print *, 'samples=', samples
 
   ! allocate solution arrays
   allocate(f(0:n+1,0:n+1))
-  allocate(g(0:n+1,0:n+1))
 
-  call init(f)
+  call init(f, cond)
 
   ! time loop
   t = 0
   do while ((t < samples ) .or. ( samples < 0))
      call stream_data(f)
      call periodic_bc(f, 1)
-     call advance(f, g)
-     t = t + 1
-
-     call stream_data(g)
-     call periodic_bc(g, 1)
-     call advance(g, f)
+     call advance(f)
      t = t + 1
   end do
 
   call stream_data(f)
 
 contains
-  subroutine advance(f, g)
-    integer :: f(0:, 0:), g(0:, 0:)
+  subroutine advance(f)
+    integer :: f(:, :)
+    integer :: g(0:size(f,1)+1, 0:size(f,2)+1)
     integer i, j
-    integer n
+    integer n, m
     ! fortran is column major, so first dimension is contiguous in memory
     !$omp parallel do private(i,j,n)
-    do j=1,ubound(f,2)-1
-       do i=1,ubound(f,1)-1
-          n = sum(f(i-1:i+1,j-1:j+1)) - 1
+    m = size(f,1)
+
+    ! fill in boundary conditions
+    g(1:m, 1:m) = f
+    g(0,:) = f(m,:)
+    g(m+1,:) = f(1,:)
+    g(:,0) = f(:,m)
+    g(:,m+1) = f(:,1)
+
+    g(0,0) = f(m,m)
+    g(1,m+1) = f(m, 1)
+    g(m+1, 1) = f(1,m)
+    g(m+1, m+1) = f(1,1)
+
+
+
+    do j=1,ubound(f,2)
+       do i=1,ubound(f,1)
+          n = sum(g(i-1:i+1,j-1:j+1)) - g(i,j)
           ! conways rules
           select case(f(i,j))
           case(ALIVE)
              ! death by underpopulation/overopulation
-             if ((n < 2) .or. (n > 3)) g(i,j) = DEAD
+             if ((n < 2) .or. (n > 3)) f(i,j) = DEAD
           case(DEAD)
-             if (n==3) g(i,j) = ALIVE
+             if (n==3) f(i,j) = ALIVE
           end select
        end do
     end do
@@ -76,19 +87,33 @@ contains
   end subroutine periodic_bc
 
 
-  subroutine init(f)
-    integer f(:,:), i, j
+  subroutine init(f, cond)
+    integer f(:,:), i, j, cond
     real ran
-
     f = DEAD
+    select case(cond)
+    case(1)
+       f(5,5:7) = (/0, 1, 0/)
+       f(6,5:7) = (/0, 0, 1/)
+       f(7,5:7) = (/1, 1, 1/)
+       print *, 'Glider Condition!'
+    case(2)
 
-    do j=lbound(f,2),ubound(f,2)
-       do i=lbound(f,1),ubound(f,1)
-          call random_number(ran)
-          if (ran < .3) f(i,j) = ALIVE
+       f(5,5:7) = (/0, 1, 1/)
+       f(6,5:7) = (/0, 1, 1/)
+       f(7,5:7) = (/0, 0, 0/)
+       print *, 'Block condition!'
+    case(3)
+
+       do j=lbound(f,2),ubound(f,2)
+          do i=lbound(f,1),ubound(f,1)
+             call random_number(ran)
+             if (ran < .3) f(i,j) = ALIVE
+          end do
        end do
-    end do
+       print *, 'Random condition!'
 
+    end select
   end subroutine init
 
 end program
