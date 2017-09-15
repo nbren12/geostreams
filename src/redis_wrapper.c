@@ -84,6 +84,11 @@ void publish_to_redis_(int* f, int* nptr , int* mptr){
 
   // trim data
   reply = redisCommand(c, "LTRIM A 0 %d", num_buffer-1);
+
+
+  // publish
+  reply = redisCommand(c, "PUBLISH A %b", buf, len);
+
   // printf("%s\n",  reply->str);
   freeReplyObject(reply);
   // redisFree(c);
