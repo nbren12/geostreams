@@ -28,7 +28,7 @@ program conways_game_of_life
   ! time loop
   t = 0
   do while ((t < samples ) .or. ( samples < 0))
-     call mysleep(1500)
+     call mysleep(300)
      call stream_data(f)
      call periodic_bc(f, 1)
      call advance(f)
@@ -136,7 +136,7 @@ contains
   subroutine mysleep(n)
     real(8) buf
     integer n, i
-    do i=1,n*1000
+    do i=1,n*10000
        call random_number(buf)
     end do
   end subroutine mysleep
