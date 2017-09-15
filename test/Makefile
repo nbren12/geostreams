@@ -12,7 +12,7 @@ redis_wrapper.o: redis_wrapper.c
 	$(CC) $(CFLAGS) -I/usr/include/hiredis -c $^
 
 test_send:   redis_mod.f90 test_send.f90 redis_wrapper.o
-	$(FC) $(LDFLAGS) $(FFLAGS) -o $@ $^
+	$(FC)  $(FFLAGS) -o $@ $^ $(LDFLAGS)
 
 
 clean:
