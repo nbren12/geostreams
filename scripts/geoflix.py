@@ -43,26 +43,26 @@ def make_document(doc):
     source2d = ColumnDataSource(data=dict(img=[img]))
     dead = img.size
     live = 0
-    source1d = ColumnDataSource(data=dict(xs=np.array([0, 0]),
-                                          ys=np.appay([dead, live]),
-                                color=["black", "red"]))
+    source1d = ColumnDataSource(data=dict(time=[], live=[]))
 
     def update():
         global current
-        current += 1
 
         da = get(shape=(200, 200))
         if da is None:
-            return
+            da = np.zeros(shape)
+
+        current += 1
 
         s1, s2 = slice(None), slice(None)
         index = [0, s1, s2]
-        new_data = da.values.flatten()
+        new_data = da.flatten()
         source2d.patch({'img': [(index, new_data)]})
 
         live = new_data.sum()
         dead = new_data.size - live
-        source1d.patch({'ys': [([0, current], np.array([dead, live]))]})
+        # print(current, live, dead)
+        source1d.stream({'time': [current], 'live': [live / dead * 100.]})
 
     p2d = figure(plot_width=500, plot_height=500,
                  x_range=(0, shape[0]),
@@ -71,15 +71,14 @@ def make_document(doc):
     p2d.image(image='img', x=0, y=0, dw=shape[0], dh=shape[1], source=source2d)
 
     p1d = figure(plot_width=500, plot_height=500,
-                 x_range=(0, shape[0]),
-                 y_range=(0, shape[1]),
-                 title="Populations")
-    p1d.multi_line('xs', 'ys', alpha=0.6, line_width=4, color="color",
-                   source=source1d)
+                 title="Population")
+    p1d.line(x='time', y='live', alpha=0.6, line_width=4, color="black",
+             source=source1d)
+    p1d.xaxis.axis_label = 'Time since begining'
+    p1d.yaxis.axis_label = '% Alive'
 
     doc.add_periodic_callback(update, 1)
     doc.title = "Streaming Conway's Game of Life"
-    doc.add_root([p2d, p1d])
     doc.add_root(gridplot([[p2d, p1d]]))
 
 
