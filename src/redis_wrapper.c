@@ -95,6 +95,7 @@ void make_dimspec(char* dimstr, int * dims, int ndims){
   offset = 0;
 
   i = 0;
+  dimstr[0] = '\0';
   sprintf(k, "%d", dims[i]);
   strcat(dimstr, k);
 
