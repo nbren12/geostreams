@@ -1,5 +1,5 @@
 FC = gfortran
-LDFLAGS = -lhiredis -lgeostreams -L../src
+LDFLAGS =  -lgeostreams -lhiredis -L../src
 FFLAGS = -g  
 
 

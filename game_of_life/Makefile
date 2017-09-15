@@ -1,7 +1,7 @@
 
 INC += -I/usr/include/hiredis
 FFLAGS = -g  $(INC)
-LDFLAGS = -lhiredis -lgfortran -lgeostreams -L../src
+LDFLAGS =  -lgfortran -lgeostreams -lhiredis -L../src
 CFLAGS += $(INC)
 
 all: game_of_life
