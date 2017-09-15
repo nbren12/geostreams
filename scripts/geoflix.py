@@ -1,24 +1,25 @@
-# This is a Bokeh server app. To function, it must be run using the
-# Bokeh server ath the command line:
-#
-#     bokeh serve --show geoflix.py
-#
-# Running "python geoflix.py" will NOT work.
-import os
 
-import numpy as np
+# coding: utf-8
+
+# In[1]:
+
+
+import os
 import xarray as xr
+import numpy as np
 
 import redis
 
+from bokeh.server.server import Server
+from bokeh.application import Application
+from bokeh.application.handlers.function import FunctionHandler
 from bokeh.plotting import figure, ColumnDataSource
 
 
 # Python interface to redis server
 r = redis.StrictRedis(host=os.getenv('REDIS_URL'),
                       port=os.getenv('REDIS_PORT'),
-                      password=os.getenv('REDIS_PW'),
-                      db=0)
+                      password=os.getenv('REDIS_PW'), db=0,)
 
 
 # get data function
@@ -42,8 +43,19 @@ def make_document(doc):
 
     doc.add_periodic_callback(update, 1)
     p2d = figure(plot_width=500, plot_height=500,
-                 x_range=(0, shape[0]), y_range=(0, shape[1]),
+                 x_range=(0, shape[0]),
+                 y_range=(0, shape[1]),
                  title="Streaming Conway's Game of Life")
     p2d.image(image='img', x=0, y=0, dw=shape[0], dh=shape[1], source=source)
     doc.title = "Streaming Conway's Game of Life"
     doc.add_root(p2d)
+
+
+apps = {'/': Application(FunctionHandler(make_document))}
+server = Server(apps,
+                port=os.getenv('BOKEH_PORT'),
+                address=os.getenv('BOKEH_URL'),
+                allow_websocket_origin=['*'])
+server.start()
+input()
+server.stop()
