@@ -10,13 +10,29 @@ const int num_buffer = 100;
 int first_run = 1;
 redisContext *c;
 
+void getenv_d(char* str, char* key, char * def)
+{
+  char *val;
+  val = getenv(key);
+  if (val != NULL) {
+    strcpy(str, val);
+    return;
+  }
+  strcpy(str, def);
+}
+
 void setupConnection(){
 
   redisReply *reply;
-  const char *hostname = "127.0.0.1";
-  char*  pass;
-  int port = 6379;
+  char hostname[256], sport[256];
+  char* pass;
 
+  getenv_d(hostname, "REDIS_URL", "127.0.0.1");
+  getenv_d(sport, "REDIS_PORT", "6379");
+  
+  int port = atoi(sport);
+
+  printf("redis-wrapper.c: Connecting to Redis Server at %s %d\n", hostname, port);
 
   struct timeval timeout = { 1, 500000 }; // 1.5 seconds
   c = redisConnectWithTimeout(hostname, port, timeout);
@@ -32,10 +48,12 @@ void setupConnection(){
 
 
   // Authenticate
-  pass = getenv("PASS");
+  pass = getenv("REDIS_PW");
   if (pass != NULL){
     redisCommand(c, "AUTH %s", pass);
   }
+
+
 }
 
 void publish_to_redis_(int* f, int* nptr , int* mptr){

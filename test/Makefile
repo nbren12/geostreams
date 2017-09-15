@@ -5,7 +5,6 @@ FFLAGS = -g
 
 all : test_send test
 test: test_send
-	./test_send
 	python3 -m unittest test.py
 
 

@@ -1,3 +1,5 @@
+import os
+from subprocess import Popen, DEVNULL
 import imp
 import unittest
 import uuid
@@ -6,9 +8,31 @@ import numpy.testing
 
 
 class ArrayTest(unittest.TestCase):
+    def setUp(self):
+        port = "6377"
+        print(f"Starting a Redis server on {port}")
+        self.redis_task = Popen(["redis-server", "--port", port], stdout=DEVNULL, stderr=DEVNULL)
+
+        try:
+            del os.environ['REDIS_PW']
+        except KeyError:
+            pass
+        os.environ['REDIS_URL'] = "127.0.0.1" 
+        os.environ['REDIS_PORT'] = port
+
+        self.env = os.environ.copy()
+        
+    def tearDown(self):
+        print("Killing Server Task")
+        self.redis_task.kill()
+  
     def test_read_from_redis(self):
         client = imp.load_source('client', '../src/client.py')
         key = 'A:1'
+	
+        print("Running test_send")
+        print(self.env)
+        Popen(['./test_send'], env=self.env).wait()
 
         # 200 rows, 100 columns
         array = client.read_from_redis(key)
