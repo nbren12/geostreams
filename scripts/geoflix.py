@@ -8,15 +8,17 @@ bokeh serve --log-level=debug --show --address=$BOKEH_URL --port=$BOKEH_PORT \
 '''
 
 import os
-import xarray as xr
 import numpy as np
 
 import redis
 
 from bokeh.plotting import figure, ColumnDataSource
 from bokeh.io import curdoc
+from bokeh.layouts import gridplot
 
 current = 0
+
+DEFAULT_SHAPE = (200, 200)
 
 
 # Python interface to redis server
@@ -26,13 +28,13 @@ r = redis.StrictRedis(host=os.getenv('REDIS_URL'),
 
 
 # get data function
-def get(key='A', shape=(22, 22)):
+def get(key='A', shape=DEFAULT_SHAPE):
     out = r.brpop(key, timeout=5)
     if out is None:
         return out
     key, vals = out
     data = np.fromstring(vals, dtype='<i4').reshape(shape, order='F')
-    return xr.DataArray(data,  dims=('x', 'y'), name=key)
+    return data
 
 
 def make_document(doc):
@@ -41,7 +43,8 @@ def make_document(doc):
     source2d = ColumnDataSource(data=dict(img=[img]))
     dead = img.size
     live = 0
-    source1d = ColumnDataSource(data=dict(xs=[0, 0], ys=[dead, live],
+    source1d = ColumnDataSource(data=dict(xs=np.array([0, 0]),
+                                          ys=np.appay([dead, live]),
                                 color=["black", "red"]))
 
     def update():
@@ -59,7 +62,7 @@ def make_document(doc):
 
         live = new_data.sum()
         dead = new_data.size - live
-        source1d.patch({'ys': [([0, current], [dead, live])]})
+        source1d.patch({'ys': [([0, current], np.array([dead, live]))]})
 
     p2d = figure(plot_width=500, plot_height=500,
                  x_range=(0, shape[0]),
@@ -76,7 +79,8 @@ def make_document(doc):
 
     doc.add_periodic_callback(update, 1)
     doc.title = "Streaming Conway's Game of Life"
-    doc.add_root(p2d)
+    doc.add_root([p2d, p1d])
+    doc.add_root(gridplot([[p2d, p1d]]))
 
 
 make_document(curdoc())
