@@ -1,8 +1,10 @@
+'''stream game of life server
 
-# coding: utf-8
+run with
 
-# In[1]:
+bokeh serve --log-level=debug --show --address=$BOKEH_URL --port=$BOKEH_PORT --allow-websocket-origin="*" geoflix.py
 
+'''
 
 import os
 import xarray as xr
