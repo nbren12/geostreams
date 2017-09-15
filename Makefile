@@ -1,7 +1,7 @@
 all:
 	make -C src
 	make -C game_of_life all
-	make -C test
+	make -C test test_send
 DOCKER = c85726db31a0
 
 run:
