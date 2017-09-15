@@ -30,7 +30,7 @@ program conways_game_of_life
   do while ((t < samples ) .or. ( samples < 0))
      call mysleep(300)
      call stream_data(f)
-     call periodic_bc(f, 1)
+     call periodic_bc(f)
      call advance(f)
      t = t + 1
      print *, t
@@ -50,23 +50,16 @@ contains
 
     ! fill in boundary conditions
     g(1:m, 1:m) = f
-    g(0,:) = f(m,:)
-    g(m+1,:) = f(1,:)
-    g(:,0) = f(:,m)
-    g(:,m+1) = f(:,1)
-
-    g(0,0) = f(m,m)
-    g(1,m+1) = f(m, 1)
-    g(m+1, 1) = f(1,m)
-    g(m+1, m+1) = f(1,1)
+    call periodic_bc(g)
 
 
 
-    do j=1,ubound(f,2)
-       do i=1,ubound(f,1)
+
+    do j=1,m
+       do i=1,m
           n = sum(g(i-1:i+1,j-1:j+1)) - g(i,j)
           ! conways rules
-          select case(f(i,j))
+          select case(g(i,j))
           case(ALIVE)
              ! death by underpopulation/overopulation
              if ((n < 2) .or. (n > 3)) f(i,j) = DEAD
@@ -79,18 +72,17 @@ contains
 
   end subroutine advance
 
-  subroutine periodic_bc(phi, g)
-    integer :: phi(:,:)
-    integer n,g,i,j
-    n = size(phi,2)
+  subroutine periodic_bc(phi)
+    integer :: phi(0:,0:)
+    integer n, m, i, j
+    m = ubound(phi,1) - 1
+    n = ubound(phi,2) - 1
 
-
-    do i=1,g
-       do j=1,size(phi,1)
-          phi(j,i) = phi(j,n-g-g+1)
-          phi(j,n-g+i) = phi(j,g+i)
-       end do
-    end do
+    ! This fills in the corners automatically
+    phi(0,:) = phi(m,:)
+    phi(m+1,:) = phi(1,:)
+    phi(:,0) = phi(:,m)
+    phi(:,m+1) = phi(:,1)
 
   end subroutine periodic_bc
 
@@ -109,8 +101,8 @@ contains
 
        do i=1,4
           do j=1,4
-             i0 = 10*i
-             j0 = 10*j
+             i0 = 10*i + 140
+             j0 = 10*j + 140
              f(i0-1:i0+1,j0-1:j0+1)  = window
           end do
        end do
