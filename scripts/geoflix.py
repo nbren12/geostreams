@@ -51,11 +51,6 @@ def make_document(doc):
     doc.add_root(p2d)
 
 
-apps = {'/': Application(FunctionHandler(make_document))}
-server = Server(apps,
-                port=os.getenv('BOKEH_PORT'),
-                address=os.getenv('BOKEH_URL'),
-                allow_websocket_origin=['*'])
-server.start()
-input()
-server.stop()
+from bokeh.io import curdoc
+make_document(curdoc())
+
