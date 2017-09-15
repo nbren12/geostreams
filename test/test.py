@@ -1,4 +1,5 @@
 import os
+import time
 from subprocess import Popen, DEVNULL
 import imp
 import unittest
@@ -23,15 +24,16 @@ class ArrayTest(unittest.TestCase):
         self.env = os.environ.copy()
         
     def tearDown(self):
+        client = imp.load_source('client', '../src/client.py')
         print("Killing Server Task")
-        self.redis_task.kill()
+        # wait a little while for the process to die
+        with client.gol_connection() as r:
+            r.shutdown()
   
     def test_read_from_redis(self):
         client = imp.load_source('client', '../src/client.py')
         key = 'A:1'
 	
-        print("Running test_send")
-        print(self.env)
         Popen(['./test_send'], env=self.env).wait()
 
         # 200 rows, 100 columns
