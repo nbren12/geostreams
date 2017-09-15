@@ -10,6 +10,6 @@ ADD test /gameoflife/test
 
 RUN cd /gameoflife && make
 
-CMD cd /gameoflife/game_of_life && /bin/bash -c "echo 1 | ./game_of_life"
+CMD cd /gameoflife/game_of_life && make && /bin/bash -c "echo 1 | ./game_of_life"
 
 
