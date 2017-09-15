@@ -3,7 +3,6 @@ import contextlib
 
 import redis
 import numpy
-from matplotlib import pyplot
 
 
 @contextlib.contextmanager
@@ -45,6 +44,7 @@ def write_to_redis(key, array):
 
 # Read from the Game Of Life key/value pair.
 def read_gol():
+    from matplotlib import pyplot
     with gol_connection() as connection:
         if connection.exists('A'):
             loaded_array = numpy.fromstring(connection.brpop('A'), dtype='<i4')
