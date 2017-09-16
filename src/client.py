@@ -7,15 +7,14 @@ import numpy
 
 @contextlib.contextmanager
 def gol_connection():
-    try:
-        password = os.environ['REDIS_PW']
-    except KeyError:
-        password = None
 
-    print('Connecting to redis server at %s:%s' % (os.environ['REDIS_URL'],
-                                                   os.environ['REDIS_PORT']))
-    connection = redis.StrictRedis(host=os.environ['REDIS_URL'],
-                                   port=os.environ['REDIS_PORT'],
+    url = os.environ.get('REDIS_URL', "127.0.0.1")
+    port = os.environ.get('REDIS_URL', "6379")
+    password = os.environ.get('REDIS_PW', None)
+
+    print(f'Connecting to redis server at {url}:{port}' )
+    connection = redis.StrictRedis(host=url,
+                                   port=port,
                                    db=0,
                                    password=password)
     yield connection
