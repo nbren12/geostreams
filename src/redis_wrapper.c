@@ -166,8 +166,8 @@ void iarray_to_redis(int *f, int* dims, int* ndims_ptr){
 
 // use const ints for dtypes because enum isn't interopable with fortran
 
-void Redis_push(redisContext * c, void * f, const char* dtype,
-                int * dims, int ndims, char * KEY){
+void Redis_push(redisContext * c, char * KEY, void * f,
+                const char* dtype, int * dims, int ndims){
   // dtype is in form i4, f8, f4, etc
 
 

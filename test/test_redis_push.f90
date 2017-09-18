@@ -21,7 +21,7 @@ program name
   ndims = 2
   dims = (/n,m/)
 
-  call redis_push(redis, f, 'f4', dims, 'A')
+  call redis_push(redis, 'A', f, 'f4', dims)
 
   call free_connection(redis)
 end program name

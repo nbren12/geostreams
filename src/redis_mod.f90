@@ -22,7 +22,7 @@ module redis_mod
        type(c_ptr), VALUE :: c
      end subroutine free_connection
 
-     subroutine c_redis_push(c, arr, dtype, dims, ndims, key) &
+     subroutine c_redis_push(c, key, arr, dtype, dims, ndims) &
           bind(c, name='Redis_push')
        use iso_c_binding
        type(c_ptr), VALUE :: c, arr
@@ -60,7 +60,7 @@ contains
 
   end subroutine stream_data
 
-  subroutine redis_push(c, arr, dtype, dims, key)
+  subroutine redis_push(c, key, arr, dtype, dims)
     use iso_c_binding
     type(c_ptr) :: c
     ! This next declaration is hacky way to make a fortran function polymorphic
@@ -75,7 +75,7 @@ contains
     dtype_c = (trim(dtype)//CHAR(0))
     key_c = (trim(key)//CHAR(0))
 
-    call c_redis_push(c, c_loc(arr), dtype_c, dims, size(dims,1), key_c)
+    call c_redis_push(c, key_c, c_loc(arr), dtype_c, dims, size(dims,1))
   end subroutine redis_push
 
 end module redis_mod
