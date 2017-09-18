@@ -19,9 +19,8 @@ program name
   end do
 
   ndims = 2
-  dims = (/n,m/)
 
-  call redis_push(redis, 'A', f, 'f4', dims)
+  call redis_push(redis, 'A', f, 'f4', shape(f))
 
   call free_connection(redis)
 end program name
