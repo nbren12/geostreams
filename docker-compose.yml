@@ -11,6 +11,7 @@ services:
       - ./scripts:/app
     depends_on:
       - redis
+      - game_of_life
   game_of_life:
     build: ./
     environment:

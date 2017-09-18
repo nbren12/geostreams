@@ -25,10 +25,15 @@ def gol_connection():
 def read_from_redis(key):
     with gol_connection() as connection:
         dimension = connection.hget(key, 'dimensions').decode('utf-8')
-        message = connection.hget(key, 'messages')  # nothing returned from this yet.
+        message = connection.hget(key, 'messages')
+        dtype = connection.hget(key, 'dtype')
+
+        # this is in here for historical reasons
+        if dtype is None:
+            dtype = 'i4'
 
         x, y = tuple(int(num) for num in dimension.split(','))
-        array = numpy.fromstring(message, dtype='<i4').reshape((x, y), order='F')
+        array = numpy.fromstring(message, dtype=dtype).reshape((x, y), order='F')
         return array
 
 
