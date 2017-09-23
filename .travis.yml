@@ -16,6 +16,7 @@ install:
   # load environment.yml
   - conda env create environment.yml
   - source activate geostreams
+  - python setup.py install
 services:
   - redis-server
 script:
