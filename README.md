@@ -1,4 +1,6 @@
 # Geostreams
+[![Build
+Status](https://travis-ci.org/nbren12/geostreams.svg?branch=master)](https://travis-ci.org/nbren12/geostreams)
 Streaming data from fortran climate/weather models.
 
 ## Goals
