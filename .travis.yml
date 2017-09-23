@@ -15,11 +15,11 @@ install:
   - conda info -a
   # load environment.yml
   - conda env create environment.yml
+  - conda install pytest
   - source activate geostreams
-  - pip install .
+  - python setup.py install
 services:
   - redis-server
 script:
-  - which python
-  - echo "Working directory:" `pwd` 
+  - which pytest
   - pytest
