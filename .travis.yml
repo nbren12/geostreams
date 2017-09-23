@@ -2,7 +2,7 @@ language: python
 python:
   - "3.6"
 install:
-  - sudo apt-get update
+  - sudo apt-get -qq update
   - sudo apt-get -y install gfortran mpich gcc make libhiredis-dev cmake
   - mkdir build && pushd build && cmake .. && make && popd
   - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
@@ -20,4 +20,6 @@ install:
 services:
   - redis-server
 script:
+  - which python
+  - echo "Working directory:" `pwd` 
   - pytest
