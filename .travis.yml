@@ -15,8 +15,8 @@ install:
   - conda info -a
   # load environment.yml
   - conda env create environment.yml
-  - conda install pytest
   - source activate geostreams
+  - conda install pytest
   - python setup.py install
 services:
   - redis-server
