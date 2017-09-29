@@ -6,6 +6,7 @@ program conways_game_of_life
   integer, parameter :: ALIVE=1, DEAD=0
   integer, allocatable :: f(:,:)
   integer n, samples, t, cond
+  integer ret
   character(len=20) :: key
 
   TYPE (c_ptr) :: redis
@@ -37,7 +38,7 @@ program conways_game_of_life
   ! time loop
   t = 0
   do while ((t < samples ) .or. ( samples < 0))
-     call mysleep(3000)
+     ret = usleep(100000)
      key = redis_uniq(redis)
      CALL redis_push(redis, key, f)
      call redis_pub(redis, 'game_of_life', key)

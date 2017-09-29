@@ -5,6 +5,13 @@ MODULE redis_mod
   CHARACTER(len=1), PARAMETER :: nullchar=CHAR(0)
 
   INTERFACE
+
+     function usleep(n) bind(c)
+       USE iso_c_binding
+       integer(c_int), value :: n
+       integer(c_int) usleep
+     end function usleep
+
      SUBROUTINE redis_test_set(c) bind(c, name='redisTestSet')
        USE iso_c_binding
        ! Arguments
