@@ -157,6 +157,13 @@ long long Redis_uniq(redisContext *c){
   return Redis_incr(c, global_counter);
 }
 
+void Redis_pub(redisContext *c, const char *channel, const char *key){
+  redisReply *reply;
+  puts("redis_wrapper.c: publishing");
+  reply = redisCommand(c, "PUBLISH %s %s", channel, key);
+  freeReplyObject(reply);
+}
+
 /******************************************************************************
  * @brief    TODO
  *****************************************************************************/

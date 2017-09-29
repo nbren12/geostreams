@@ -44,6 +44,13 @@ MODULE redis_mod
        integer(c_long_long) :: y
      END FUNCTION c_redis_uniq
 
+     SUBROUTINE c_redis_pub(c, channel, key) &
+          bind(c, name='Redis_pub')
+       use iso_c_binding
+       TYPE(c_ptr), VALUE    :: c
+       CHARACTER(c_char)     :: channel(*), key(*)
+     END SUBROUTINE c_redis_pub
+
   END INTERFACE
 
   INTERFACE redis_push
@@ -56,11 +63,23 @@ MODULE redis_mod
 CONTAINS
 
   function redis_uniq(c)
+    ! Get uniq key using incr
     type(c_ptr)  :: c
     character(len=20) :: redis_uniq
     character(len=3) :: fmt
     write(redis_uniq,'(I0)') c_redis_uniq(c)
   end function redis_uniq
+
+  subroutine redis_pub (c, channel, key)
+    type(c_ptr)  :: c
+    character(len=*) :: channel, key
+    character(len=255) :: channel_c, key_c
+
+    channel_c = trim(channel)//nullchar
+    key_c = trim(key)//nullchar
+
+    call c_redis_pub(c, channel_c, key_c)
+  end subroutine redis_pub
 
   SUBROUTINE redis_push_f4_1d(c, key, arr)
     ! Push data to redis server (single precision)
