@@ -1,11 +1,11 @@
-program name
-  use redis_mod
-  implicit none
+PROGRAM name
+  USE redis_mod
+  IMPLICIT NONE
 
-  type(c_ptr) c
+  TYPE(c_ptr) :: c
 
   c =  setup_connection()
-  call redis_test_set(c)
-  call free_connection(c)
+  CALL redis_test_set(c)
+  CALL free_connection(c)
 
-end program name
+END PROGRAM name

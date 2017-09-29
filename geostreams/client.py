@@ -12,7 +12,7 @@ def gol_connection():
     port = os.environ.get('REDIS_URL', "6379")
     password = os.environ.get('REDIS_PW', None)
 
-    print(f'Connecting to redis server at {url}:{port}' )
+    print(f'Connecting to redis server at {url}:{port}')
     connection = redis.StrictRedis(host=url,
                                    port=port,
                                    db=0,
@@ -33,8 +33,8 @@ def read_from_redis(key):
             dtype = 'i4'
 
         x, y = tuple(int(num) for num in dimension.split(','))
-        array = numpy.fromstring(message, dtype=dtype).reshape((x, y), order='F')
-        return array
+        array = numpy.fromstring(message, dtype=dtype)
+        return array.reshape((x, y), order='F')
 
 
 def write_to_redis(key, array):

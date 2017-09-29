@@ -7,6 +7,10 @@ program conways_game_of_life
   integer, allocatable :: f(:,:)
   integer n, samples, t, cond
 
+  TYPE (c_ptr) :: redis
+
+  redis = setup_connection()
+
   ! get input from command line
   print *, 'Enter ngrid, nsamples'
   read(11, *) n, samples,cond
@@ -29,14 +33,14 @@ program conways_game_of_life
   t = 0
   do while ((t < samples ) .or. ( samples < 0))
      call mysleep(300)
-     call stream_data(f)
+     CALL redis_push(redis, 'A', f)
      call periodic_bc(f)
      call advance(f)
      t = t + 1
      print *, t
   end do
 
-  call stream_data(f)
+  CALL redis_push(redis, 'A', f)
 
 contains
   subroutine advance(f)
@@ -51,9 +55,6 @@ contains
     ! fill in boundary conditions
     g(1:m, 1:m) = f
     call periodic_bc(g)
-
-
-
 
     do j=1,m
        do i=1,m
@@ -74,7 +75,7 @@ contains
 
   subroutine periodic_bc(phi)
     integer :: phi(0:,0:)
-    integer n, m, i, j
+    integer n, m
     m = ubound(phi,1) - 1
     n = ubound(phi,2) - 1
 
