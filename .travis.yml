@@ -18,7 +18,6 @@ install:
   # load environment.yml
   - conda env create environment.yml
   - source activate geostreams
-  - conda install pytest
   - make build
   - python setup.py install
 services:
