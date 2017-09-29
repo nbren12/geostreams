@@ -33,7 +33,7 @@ def test_write_to_redis():
         with client.gol_connection() as connection:
             connection.delete(key)
 
-@pytest.mark.parametrize("exe", ['test_connect', 'test_redis_push'])
+@pytest.mark.parametrize("exe", ['test_connect', 'test_redis_push', 'test_getuniq'])
 def test_exes(exe_dir, exe):
     run_project_exe(exe, exe_dir)
 

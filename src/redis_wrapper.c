@@ -6,6 +6,7 @@
 
 // Global Variables
 const int     num_buffer = 100;
+const char    global_counter[] = "GeostreamsCTR";
 int           first_run = 1;
 redisContext *globalconn;
 
@@ -140,6 +141,20 @@ void Redis_push(redisContext *c,
                          KEY, dtype, f, len, dimspec);
 
     freeReplyObject(reply);
+}
+
+long long Redis_incr(redisContext *c, const char *key){
+  long long out;
+  redisReply *reply;
+  reply = redisCommand(c, "INCR %s", key);
+
+  out =  reply->integer;
+  freeReplyObject(reply);
+  return out;
+}
+
+long long Redis_uniq(redisContext *c){
+  return Redis_incr(c, global_counter);
 }
 
 /******************************************************************************

@@ -30,6 +30,20 @@ MODULE redis_mod
        INTEGER(c_int), VALUE :: ndims
        INTEGER(c_int)        :: dims(ndims)
      END SUBROUTINE c_redis_push
+
+     FUNCTION c_redis_incr(c, key) result(y) bind(c, name='Redis_incr')
+       use iso_c_binding
+       TYPE(c_ptr), VALUE    :: c
+       CHARACTER(c_char)     :: key(*)
+       integer(c_long_long) :: y
+     END FUNCTION c_redis_incr
+
+     FUNCTION redis_uniq(c) result(y) bind(c, name='Redis_uniq')
+       use iso_c_binding
+       TYPE(c_ptr), VALUE    :: c
+       integer(c_long_long) :: y
+     END FUNCTION redis_uniq
+
   END INTERFACE
 
   INTERFACE redis_push
@@ -40,7 +54,6 @@ MODULE redis_mod
   END INTERFACE redis_push
 
 CONTAINS
-
 
   SUBROUTINE redis_push_f4_1d(c, key, arr)
     ! Push data to redis server (single precision)
