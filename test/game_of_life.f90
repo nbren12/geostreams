@@ -6,6 +6,7 @@ program conways_game_of_life
   integer, parameter :: ALIVE=1, DEAD=0
   integer, allocatable :: f(:,:)
   integer n, samples, t, cond
+  character(len=20) :: key
 
   TYPE (c_ptr) :: redis
 
@@ -13,13 +14,17 @@ program conways_game_of_life
 
   ! get input from command line
   print *, 'Enter ngrid, nsamples'
-  read(11, *) n, samples,cond
+  ! read(11, *) n, samples,cond
+  
   print *, 'Enter number for initial condition'
   print *, '1 - Glider'
   print *, '2 - Box (Stationary)'
   print *, '3 - Random'
-  read *, cond
+  !read *, cond
 
+  n = 200
+  samples = 100000000
+  cond = 3
 
   print *, 'ngrid=', n
   print *, 'samples=', samples
@@ -32,8 +37,10 @@ program conways_game_of_life
   ! time loop
   t = 0
   do while ((t < samples ) .or. ( samples < 0))
-     call mysleep(300)
-     CALL redis_push(redis, 'A', f)
+     call mysleep(3000)
+     key = redis_uniq(redis)
+     CALL redis_push(redis, key, f)
+     call redis_pub(redis, 'game_of_life', key)
      call periodic_bc(f)
      call advance(f)
      t = t + 1
