@@ -8,14 +8,14 @@ PROGRAM test_uniq
   INTEGER*4 :: i4(n,m)
   INTEGER ndims
   INTEGER i, j
-  integer :: key
+  character*20 :: key
 
   TYPE (c_ptr) :: redis
 
   redis = setup_connection()
   do i=1,100
      key = redis_uniq(redis)
-     print *, 'Key is ', key
+     print *, 'Key is ', trim(key), '.'
   end do
   CALL free_connection(redis)
 END PROGRAM test_uniq

@@ -38,11 +38,11 @@ MODULE redis_mod
        integer(c_long_long) :: y
      END FUNCTION c_redis_incr
 
-     FUNCTION redis_uniq(c) result(y) bind(c, name='Redis_uniq')
+     FUNCTION c_redis_uniq(c) result(y) bind(c, name='Redis_uniq')
        use iso_c_binding
        TYPE(c_ptr), VALUE    :: c
        integer(c_long_long) :: y
-     END FUNCTION redis_uniq
+     END FUNCTION c_redis_uniq
 
   END INTERFACE
 
@@ -54,6 +54,13 @@ MODULE redis_mod
   END INTERFACE redis_push
 
 CONTAINS
+
+  function redis_uniq(c)
+    type(c_ptr)  :: c
+    character(len=20) :: redis_uniq
+    character(len=3) :: fmt
+    write(redis_uniq,'(I0)') c_redis_uniq(c)
+  end function redis_uniq
 
   SUBROUTINE redis_push_f4_1d(c, key, arr)
     ! Push data to redis server (single precision)
