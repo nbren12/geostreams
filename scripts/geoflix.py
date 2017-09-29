@@ -41,8 +41,6 @@ def make_document(doc):
     shape = (200, 200)
     img = np.zeros(shape)
     source2d = ColumnDataSource(data=dict(img=[img]))
-    dead = img.size
-    live = 0
     source1d = ColumnDataSource(data=dict(time=[], live=[]))
 
     def update():

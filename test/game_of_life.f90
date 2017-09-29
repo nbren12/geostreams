@@ -9,14 +9,14 @@ program conways_game_of_life
   integer ret
   character(len=20) :: key
 
-  TYPE (c_ptr) :: redis
+  type (c_ptr) :: redis
 
   redis = setup_connection()
 
   ! get input from command line
   print *, 'Enter ngrid, nsamples'
   ! read(11, *) n, samples,cond
-  
+
   print *, 'Enter number for initial condition'
   print *, '1 - Glider'
   print *, '2 - Box (Stationary)'
@@ -40,7 +40,7 @@ program conways_game_of_life
   do while ((t < samples ) .or. ( samples < 0))
      ret = usleep(100000)
      key = redis_uniq(redis)
-     CALL redis_push(redis, key, f)
+     call redis_push(redis, key, f)
      call redis_pub(redis, 'game_of_life', key)
      call periodic_bc(f)
      call advance(f)
@@ -48,7 +48,7 @@ program conways_game_of_life
      print *, t
   end do
 
-  CALL redis_push(redis, 'A', f)
+  call redis_push(redis, 'A', f)
 
 contains
   subroutine advance(f)
@@ -142,4 +142,4 @@ contains
     end do
   end subroutine mysleep
 
-end program
+end program conways_game_of_life

@@ -154,4 +154,4 @@ contains
     ! TODO this is a function stub
   end subroutine stream_data
 
-end program
+end program conways_game_of_life

@@ -1,73 +1,73 @@
-MODULE redis_mod
-  USE iso_c_binding
-  IMPLICIT NONE
+module redis_mod
+  use iso_c_binding
+  implicit none
 
-  CHARACTER(len=1), PARAMETER :: nullchar=CHAR(0)
+  character(len=1), parameter :: nullchar=char(0)
 
-  INTERFACE
+  interface
 
      function usleep(n) bind(c)
-       USE iso_c_binding
+       use iso_c_binding
        integer(c_int), value :: n
        integer(c_int) usleep
      end function usleep
 
-     SUBROUTINE redis_test_set(c) bind(c, name='redisTestSet')
-       USE iso_c_binding
+     subroutine redis_test_set(c) bind(c, name='redisTestSet')
+       use iso_c_binding
        ! Arguments
-       TYPE(c_ptr), VALUE :: c
-     END SUBROUTINE redis_test_set
+       type(c_ptr), VALUE :: c
+     end subroutine redis_test_set
 
-     TYPE(c_ptr) FUNCTION setup_connection() bind(c, name='setupConnection')
-       USE iso_c_binding
-     END FUNCTION setup_connection
+     type(c_ptr) function setup_connection() bind(c, name='setupConnection')
+       use iso_c_binding
+     end function setup_connection
 
-     SUBROUTINE free_connection(c) bind(c, name='redisFree')
-       USE iso_c_binding
+     subroutine free_connection(c) bind(c, name='redisFree')
+       use iso_c_binding
        ! Arguments
-       TYPE(c_ptr), VALUE :: c
-     END SUBROUTINE free_connection
+       type(c_ptr), VALUE :: c
+     end subroutine free_connection
 
-     SUBROUTINE c_redis_push(c, key, arr, dtype, dims, ndims) &
+     subroutine c_redis_push(c, key, arr, dtype, dims, ndims) &
           bind(c, name='Redis_push')
-       USE iso_c_binding
+       use iso_c_binding
        ! Arguments
-       TYPE(c_ptr), VALUE    :: c, arr
-       CHARACTER(c_char)     :: dtype(*), key(*)
-       INTEGER(c_int), VALUE :: ndims
-       INTEGER(c_int)        :: dims(ndims)
-     END SUBROUTINE c_redis_push
+       type(c_ptr), VALUE    :: c, arr
+       character(c_char)     :: dtype(*), key(*)
+       integer(c_int), VALUE :: ndims
+       integer(c_int)        :: dims(ndims)
+     end subroutine c_redis_push
 
-     FUNCTION c_redis_incr(c, key) result(y) bind(c, name='Redis_incr')
+     function c_redis_incr(c, key) result(y) bind(c, name='Redis_incr')
        use iso_c_binding
-       TYPE(c_ptr), VALUE    :: c
-       CHARACTER(c_char)     :: key(*)
+       type(c_ptr), VALUE    :: c
+       character(c_char)     :: key(*)
        integer(c_long_long) :: y
-     END FUNCTION c_redis_incr
+     end function c_redis_incr
 
-     FUNCTION c_redis_uniq(c) result(y) bind(c, name='Redis_uniq')
+     function c_redis_uniq(c) result(y) bind(c, name='Redis_uniq')
        use iso_c_binding
-       TYPE(c_ptr), VALUE    :: c
+       type(c_ptr), VALUE    :: c
        integer(c_long_long) :: y
-     END FUNCTION c_redis_uniq
+     end function c_redis_uniq
 
-     SUBROUTINE c_redis_pub(c, channel, key) &
+     subroutine c_redis_pub(c, channel, key) &
           bind(c, name='Redis_pub')
        use iso_c_binding
-       TYPE(c_ptr), VALUE    :: c
-       CHARACTER(c_char)     :: channel(*), key(*)
-     END SUBROUTINE c_redis_pub
+       type(c_ptr), VALUE    :: c
+       character(c_char)     :: channel(*), key(*)
+     end subroutine c_redis_pub
 
-  END INTERFACE
+  end interface
 
-  INTERFACE redis_push
-     MODULE PROCEDURE redis_push_f4_1d, redis_push_f4_2d, redis_push_f4_3d, &
+  interface redis_push
+     module procedure redis_push_f4_1d, redis_push_f4_2d, redis_push_f4_3d, &
           redis_push_f8_1d, redis_push_f8_2d, redis_push_f8_3d, &
           redis_push_i2_1d, redis_push_i2_2d, redis_push_i2_3d, &
           redis_push_i4_1d, redis_push_i4_2d, redis_push_i4_3d
-  END INTERFACE redis_push
+  end interface
 
-CONTAINS
+contains
 
   function redis_uniq(c)
     ! Get uniq key using incr
@@ -88,7 +88,7 @@ CONTAINS
     call c_redis_pub(c, channel_c, key_c)
   end subroutine redis_pub
 
-  SUBROUTINE redis_push_f4_1d(c, key, arr)
+  subroutine redis_push_f4_1d(c, key, arr)
     ! Push data to redis server (single precision)
     !
     ! Inputs
@@ -99,23 +99,23 @@ CONTAINS
     !     Redis key
     ! arr : ARRAY(REAL*4)
     !     4-Byte floating point array
-    USE iso_c_binding
+    use iso_c_binding
     ! Arguments
-    TYPE(c_ptr), INTENT(in)                  :: c
-    REAL*4, DIMENSION(:), TARGET, INTENT(in) :: arr
-    CHARACTER(len=*), INTENT(in)             :: key
+    type(c_ptr), intent(in)                  :: c
+    real*4, dimension(:), target, intent(in) :: arr
+    character(len=*), intent(in)             :: key
     ! Local Variables
-    CHARACTER(len=3)                         :: dtype
+    character(len=3)                         :: dtype
 
     ! array type
     dtype = endian()//"f4"
 
     ! Publish via explicit form
-    CALL redis_push_explicit(c, key, arr, dtype, SHAPE(arr))
-  END SUBROUTINE redis_push_f4_1d
+    call redis_push_explicit(c, key, arr, dtype, shape(arr))
+  end subroutine redis_push_f4_1d
 
 
-  SUBROUTINE redis_push_f4_2d(c, key, arr)
+  subroutine redis_push_f4_2d(c, key, arr)
     ! Push data to redis server (single precision)
     !
     ! Inputs
@@ -126,23 +126,23 @@ CONTAINS
     !     Redis key
     ! arr : ARRAY(REAL*4)
     !     4-Byte floating point array
-    USE iso_c_binding
+    use iso_c_binding
     ! Arguments
-    TYPE(c_ptr), INTENT(in)                     :: c
-    REAL*4, DIMENSION(:, :), TARGET, INTENT(in) :: arr
-    CHARACTER(len=*), INTENT(in)                :: key
+    type(c_ptr), intent(in)                     :: c
+    real*4, dimension(:, :), target, intent(in) :: arr
+    character(len=*), intent(in)                :: key
     ! Local Variables
-    CHARACTER(len=3)                            :: dtype
+    character(len=3)                            :: dtype
 
     ! array type
     dtype = endian()//"f4"
 
     ! Publish via explicit form!
-    CALL redis_push_explicit(c, key, arr, dtype, SHAPE(arr))
-  END SUBROUTINE redis_push_f4_2d
+    call redis_push_explicit(c, key, arr, dtype, shape(arr))
+  end subroutine redis_push_f4_2d
 
 
-  SUBROUTINE redis_push_f4_3d(c, key, arr)
+  subroutine redis_push_f4_3d(c, key, arr)
     ! Push data to redis server (single precision)
     !
     ! Inputs
@@ -153,22 +153,22 @@ CONTAINS
     !     Redis key
     ! arr : ARRAY(REAL*4)
     !     4-Byte floating point array
-    USE iso_c_binding
+    use iso_c_binding
     ! Arguments
-    TYPE(c_ptr), INTENT(in)                        :: c
-    REAL*4, DIMENSION(:, :, :), TARGET, INTENT(in) :: arr
-    CHARACTER(len=*), INTENT(in)                   :: key
+    type(c_ptr), intent(in)                        :: c
+    real*4, dimension(:, :, :), target, intent(in) :: arr
+    character(len=*), intent(in)                   :: key
     ! Local Variables
-    CHARACTER(len=3)                               :: dtype
+    character(len=3)                               :: dtype
 
     ! array type
     dtype = endian()//"f4"
 
     ! Publish via explicit form!
-    CALL redis_push_explicit(c, key, arr, dtype, SHAPE(arr))
-  END SUBROUTINE redis_push_f4_3d
+    call redis_push_explicit(c, key, arr, dtype, shape(arr))
+  end subroutine redis_push_f4_3d
 
-  SUBROUTINE redis_push_f8_1d(c, key, arr)
+  subroutine redis_push_f8_1d(c, key, arr)
     ! Push data to redis server (double precision)
     !
     ! Inputs
@@ -179,23 +179,23 @@ CONTAINS
     !     Redis key
     ! arr : ARRAY(REAL*8)
     !     8-Byte floating point array
-    USE iso_c_binding
+    use iso_c_binding
     ! Arguments
-    TYPE(c_ptr), INTENT(in)                  :: c
-    REAL*8, DIMENSION(:), TARGET, INTENT(in) :: arr
-    CHARACTER(len=*), INTENT(in)             :: key
+    type(c_ptr), intent(in)                  :: c
+    real*8, dimension(:), target, intent(in) :: arr
+    character(len=*), intent(in)             :: key
     ! Local Variables
-    CHARACTER(len=3)                         :: dtype
+    character(len=3)                         :: dtype
 
     ! array type
     dtype = endian()//"f8"
 
     ! Publish via explicit form
-    CALL redis_push_explicit(c, key, arr, dtype, SHAPE(arr))
-  END SUBROUTINE redis_push_f8_1d
+    call redis_push_explicit(c, key, arr, dtype, shape(arr))
+  end subroutine redis_push_f8_1d
 
 
-  SUBROUTINE redis_push_f8_2d(c, key, arr)
+  subroutine redis_push_f8_2d(c, key, arr)
     ! Push data to redis server (double precision)
     !
     ! Inputs
@@ -206,50 +206,50 @@ CONTAINS
     !     Redis key
     ! arr : ARRAY(REAL*8)
     !     8-Byte floating point array
-    USE iso_c_binding
+    use iso_c_binding
     ! Arguments
-    TYPE(c_ptr), INTENT(in)                     :: c
-    REAL*8, DIMENSION(:, :), TARGET, INTENT(in) :: arr
-    CHARACTER(len=*), INTENT(in)                :: key
+    type(c_ptr), intent(in)                     :: c
+    real*8, dimension(:, :), target, intent(in) :: arr
+    character(len=*), intent(in)                :: key
     ! Local Variables
-    CHARACTER(len=3)                            :: dtype
-
-    ! array type
-    dtype = endian()//"f8"
-
-    ! Publish via explicit form!
-    CALL redis_push_explicit(c, key, arr, dtype, SHAPE(arr))
-  END SUBROUTINE redis_push_f8_2d
-
-
-  SUBROUTINE redis_push_f8_3d(c, key, arr)
-    ! Push data to redis server (double precision)
-    !
-    ! Inputs
-    ! -------
-    ! c : c_ptr
-    !     Pointer to redisContext structure
-    ! key : CHARACTER
-    !     Redis key
-    ! arr : ARRAY(REAL*8)
-    !     8-Byte floating point array
-    USE iso_c_binding
-    ! Arguments
-    TYPE(c_ptr), INTENT(in)                        :: c
-    REAL*8, DIMENSION(:, :, :), TARGET, INTENT(in) :: arr
-    CHARACTER(len=*), INTENT(in)                   :: key
-    ! Local Variables
-    CHARACTER(len=3)                               :: dtype
+    character(len=3)                            :: dtype
 
     ! array type
     dtype = endian()//"f8"
 
     ! Publish via explicit form!
-    CALL redis_push_explicit(c, key, arr, dtype, SHAPE(arr))
-  END SUBROUTINE redis_push_f8_3d
+    call redis_push_explicit(c, key, arr, dtype, shape(arr))
+  end subroutine redis_push_f8_2d
 
 
-  SUBROUTINE redis_push_i2_1d(c, key, arr)
+  subroutine redis_push_f8_3d(c, key, arr)
+    ! Push data to redis server (double precision)
+    !
+    ! Inputs
+    ! -------
+    ! c : c_ptr
+    !     Pointer to redisContext structure
+    ! key : CHARACTER
+    !     Redis key
+    ! arr : ARRAY(REAL*8)
+    !     8-Byte floating point array
+    use iso_c_binding
+    ! Arguments
+    type(c_ptr), intent(in)                        :: c
+    real*8, dimension(:, :, :), target, intent(in) :: arr
+    character(len=*), intent(in)                   :: key
+    ! Local Variables
+    character(len=3)                               :: dtype
+
+    ! array type
+    dtype = endian()//"f8"
+
+    ! Publish via explicit form!
+    call redis_push_explicit(c, key, arr, dtype, shape(arr))
+  end subroutine redis_push_f8_3d
+
+
+  subroutine redis_push_i2_1d(c, key, arr)
     ! Push data to redis server (short int)
     !
     ! Inputs
@@ -260,23 +260,23 @@ CONTAINS
     !     Redis key
     ! arr : ARRAY(INTEGER*2)
     !     2-Byte integer array
-    USE iso_c_binding
+    use iso_c_binding
     ! Arguments
-    TYPE(c_ptr), INTENT(in)                     :: c
-    INTEGER*2, DIMENSION(:), TARGET, INTENT(in) :: arr
-    CHARACTER(len=*), INTENT(in)                :: key
+    type(c_ptr), intent(in)                     :: c
+    integer*2, dimension(:), target, intent(in) :: arr
+    character(len=*), intent(in)                :: key
     ! Local Variables
-    CHARACTER(len=3)                            :: dtype
+    character(len=3)                            :: dtype
 
     ! array type
     dtype = endian()//"i2"
 
     ! Publish via explicit form
-    CALL redis_push_explicit(c, key, arr, dtype, SHAPE(arr))
-  END SUBROUTINE redis_push_i2_1d
+    call redis_push_explicit(c, key, arr, dtype, shape(arr))
+  end subroutine redis_push_i2_1d
 
 
-  SUBROUTINE redis_push_i2_2d(c, key, arr)
+  subroutine redis_push_i2_2d(c, key, arr)
     ! Push data to redis server (short int)
     !
     ! Inputs
@@ -287,23 +287,23 @@ CONTAINS
     !     Redis key
     ! arr : ARRAY(INTEGER*2)
     !     2-Byte integer array
-    USE iso_c_binding
+    use iso_c_binding
     ! Arguments
-    TYPE(c_ptr), INTENT(in)                        :: c
-    INTEGER*2, DIMENSION(:, :), TARGET, INTENT(in) :: arr
-    CHARACTER(len=*), INTENT(in)                   :: key
+    type(c_ptr), intent(in)                        :: c
+    integer*2, dimension(:, :), target, intent(in) :: arr
+    character(len=*), intent(in)                   :: key
     ! Local Variables
-    CHARACTER(len=3)                               :: dtype
+    character(len=3)                               :: dtype
 
     ! array type
     dtype = endian()//"i2"
 
     ! Publish via explicit form
-    CALL redis_push_explicit(c, key, arr, dtype, SHAPE(arr))
-  END SUBROUTINE redis_push_i2_2d
+    call redis_push_explicit(c, key, arr, dtype, shape(arr))
+  end subroutine redis_push_i2_2d
 
 
-  SUBROUTINE redis_push_i2_3d(c, key, arr)
+  subroutine redis_push_i2_3d(c, key, arr)
     ! Push data to redis server (short int)
     !
     ! Inputs
@@ -314,23 +314,23 @@ CONTAINS
     !     Redis key
     ! arr : ARRAY(INTEGER*2)
     !     2-Byte integer array
-    USE iso_c_binding
+    use iso_c_binding
     ! Arguments
-    TYPE(c_ptr), INTENT(in)                           :: c
-    INTEGER*2, DIMENSION(:, :, :), TARGET, INTENT(in) :: arr
-    CHARACTER(len=*), INTENT(in)                      :: key
+    type(c_ptr), intent(in)                           :: c
+    integer*2, dimension(:, :, :), target, intent(in) :: arr
+    character(len=*), intent(in)                      :: key
     ! Local Variables
-    CHARACTER(len=3)                                  :: dtype
+    character(len=3)                                  :: dtype
 
     ! array type
     dtype = endian()//"i2"
 
     ! Publish via explicit form
-    CALL redis_push_explicit(c, key, arr, dtype, SHAPE(arr))
-  END SUBROUTINE redis_push_i2_3d
+    call redis_push_explicit(c, key, arr, dtype, shape(arr))
+  end subroutine redis_push_i2_3d
 
 
-  SUBROUTINE redis_push_i4_1d(c, key, arr)
+  subroutine redis_push_i4_1d(c, key, arr)
     ! Push data to redis server (long int)
     !
     ! Inputs
@@ -341,23 +341,23 @@ CONTAINS
     !     Redis key
     ! arr : ARRAY(INTEGER*4)
     !     4-Byte integer array
-    USE iso_c_binding
+    use iso_c_binding
     ! Arguments
-    TYPE(c_ptr), INTENT(in)                     :: c
-    INTEGER*4, DIMENSION(:), TARGET, INTENT(in) :: arr
-    CHARACTER(len=*), INTENT(in)                :: key
+    type(c_ptr), intent(in)                     :: c
+    integer*4, dimension(:), target, intent(in) :: arr
+    character(len=*), intent(in)                :: key
     ! Local Variables
-    CHARACTER(len=3)                            :: dtype
+    character(len=3)                            :: dtype
 
     ! array type
     dtype = endian()//"i4"
 
     ! Publish via explicit form
-    CALL redis_push_explicit(c, key, arr, dtype, SHAPE(arr))
-  END SUBROUTINE redis_push_i4_1d
+    call redis_push_explicit(c, key, arr, dtype, shape(arr))
+  end subroutine redis_push_i4_1d
 
 
-  SUBROUTINE redis_push_i4_2d(c, key, arr)
+  subroutine redis_push_i4_2d(c, key, arr)
     ! Push data to redis server (long int)
     !
     ! Inputs
@@ -368,23 +368,23 @@ CONTAINS
     !     Redis key
     ! arr : ARRAY(INTEGER*4)
     !     4-Byte integer array
-    USE iso_c_binding
+    use iso_c_binding
     ! Arguments
-    TYPE(c_ptr), INTENT(in)                        :: c
-    INTEGER*4, DIMENSION(:, :), TARGET, INTENT(in) :: arr
-    CHARACTER(len=*), INTENT(in)                   :: key
+    type(c_ptr), intent(in)                        :: c
+    integer*4, dimension(:, :), target, intent(in) :: arr
+    character(len=*), intent(in)                   :: key
     ! Local Variables
-    CHARACTER(len=3)                               :: dtype
+    character(len=3)                               :: dtype
 
     ! array type
     dtype = endian()//"i4"
 
     ! Publish via explicit form
-    CALL redis_push_explicit(c, key, arr, dtype, SHAPE(arr))
-  END SUBROUTINE redis_push_i4_2d
+    call redis_push_explicit(c, key, arr, dtype, shape(arr))
+  end subroutine redis_push_i4_2d
 
 
-  SUBROUTINE redis_push_i4_3d(c, key, arr)
+  subroutine redis_push_i4_3d(c, key, arr)
     ! Push data to redis server (long int)
     !
     ! Inputs
@@ -395,23 +395,23 @@ CONTAINS
     !     Redis key
     ! arr : ARRAY(INTEGER*4)
     !     4-Byte integer array
-    USE iso_c_binding
+    use iso_c_binding
     ! Arguments
-    TYPE(c_ptr), INTENT(in)                           :: c
-    INTEGER*4, DIMENSION(:, :, :), TARGET, INTENT(in) :: arr
-    CHARACTER(len=*), INTENT(in)                      :: key
+    type(c_ptr), intent(in)                           :: c
+    integer*4, dimension(:, :, :), target, intent(in) :: arr
+    character(len=*), intent(in)                      :: key
     ! Local Variables
-    CHARACTER(len=3)                                  :: dtype
+    character(len=3)                                  :: dtype
 
     ! array type
     dtype = endian()//"i4"
 
     ! Publish via explicit form
-    CALL redis_push_explicit(c, key, arr, dtype, SHAPE(arr))
-  END SUBROUTINE redis_push_i4_3d
+    call redis_push_explicit(c, key, arr, dtype, shape(arr))
+  end subroutine redis_push_i4_3d
 
 
-  SUBROUTINE redis_push_explicit(c, key, arr, dtype, dims)
+  subroutine redis_push_explicit(c, key, arr, dtype, dims)
     ! Push data to redis server, interfacing with C library
     !
     ! Inputs
@@ -426,42 +426,42 @@ CONTAINS
     !     Character string describing the endianess/type of ``arr`` (e.g. <f8)
     ! dims : INTEGER
     !     Shape of ``arr``
-    USE iso_c_binding
+    use iso_c_binding
 
-    TYPE(c_ptr)        :: c
-    TYPE(*), TARGET    :: arr(*)  ! hacky way to make a fortran function polymorphic
-    CHARACTER(len=*)   :: dtype, key
-    INTEGER(c_int)     :: dims(:)
+    type(c_ptr)        :: c
+    type(*), target    :: arr(*)  ! hacky way to make a fortran function polymorphic
+    character(len=*)   :: dtype, key
+    integer(c_int)     :: dims(:)
 
-    CHARACTER(len=4)   :: dtype_c  ! e.g. "<f8\0"
-    CHARACTER(len=128) :: key_c  ! e.g. "\0"
+    character(len=4)   :: dtype_c  ! e.g. "<f8\0"
+    character(len=128) :: key_c  ! e.g. "\0"
 
     ! strings in C need to be null-terminated
-    dtype_c = TRIM(dtype)//nullchar
-    key_c = TRIM(key)//nullchar
+    dtype_c = trim(dtype)//nullchar
+    key_c = trim(key)//nullchar
 
     ! call C interface
-    CALL c_redis_push(c, key_c, c_loc(arr), dtype_c, dims, SIZE(dims,1))
-  END SUBROUTINE redis_push_explicit
+    call c_redis_push(c, key_c, c_loc(arr), dtype_c, dims, size(dims,1))
+  end subroutine redis_push_explicit
 
 
-  FUNCTION endian() RESULT(e)
+  function endian() result(e)
     ! Determine native byte order
     !
     ! Returns
     ! -------
     ! endianess : character
     !     '>' if little-endian, '<' big-endian
-    CHARACTER(1) :: e
-    LOGICAL      :: bigend
+    character(1) :: e
+    logical      :: bigend
 
-    bigend = ICHAR(TRANSFER(1,'a')) == 0
+    bigend = ichar(transfer(1,'a')) == 0
 
-    IF (bigend) THEN
+    if (bigend) then
        e = '>'
-    ELSE
+    else
        e = '<'
-    END IF
-  END FUNCTION endian
+    end if
+  end function endian
 
-END MODULE redis_mod
+end module redis_mod

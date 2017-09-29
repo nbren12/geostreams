@@ -71,7 +71,6 @@ redisContext *setupConnection()
     return c;
 }
 
-
 /******************************************************************************
  * @brief    TODO
  *****************************************************************************/
@@ -108,7 +107,6 @@ size_t prod(int  init,
     return len;
 }
 
-
 /******************************************************************************
  * @brief    TODO
 
@@ -143,25 +141,31 @@ void Redis_push(redisContext *c,
     freeReplyObject(reply);
 }
 
-long long Redis_incr(redisContext *c, const char *key){
-  long long out;
-  redisReply *reply;
-  reply = redisCommand(c, "INCR %s", key);
+long long Redis_incr(redisContext *c,
+                     const char   *key)
+{
+    long long   out;
+    redisReply *reply;
+    reply = redisCommand(c, "INCR %s", key);
 
-  out =  reply->integer;
-  freeReplyObject(reply);
-  return out;
+    out = reply->integer;
+    freeReplyObject(reply);
+    return out;
 }
 
-long long Redis_uniq(redisContext *c){
-  return Redis_incr(c, global_counter);
+long long Redis_uniq(redisContext *c)
+{
+    return Redis_incr(c, global_counter);
 }
 
-void Redis_pub(redisContext *c, const char *channel, const char *key){
-  redisReply *reply;
-  puts("redis_wrapper.c: publishing");
-  reply = redisCommand(c, "PUBLISH %s %s", channel, key);
-  freeReplyObject(reply);
+void Redis_pub(redisContext *c,
+               const char   *channel,
+               const char   *key)
+{
+    redisReply *reply;
+    puts("redis_wrapper.c: publishing");
+    reply = redisCommand(c, "PUBLISH %s %s", channel, key);
+    freeReplyObject(reply);
 }
 
 /******************************************************************************
