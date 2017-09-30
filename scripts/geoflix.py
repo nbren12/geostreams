@@ -16,25 +16,44 @@ from bokeh.plotting import figure, ColumnDataSource
 from bokeh.io import curdoc
 from bokeh.layouts import gridplot
 
+from collections import deque
+
+from streamz import Stream
+from geostreams.client import redis_connection, read_from_redis
+from threading import Thread
+
 current = 0
 
 DEFAULT_SHAPE = (200, 200)
 
 
-# Python interface to redis server
-r = redis.StrictRedis(host=os.getenv('REDIS_URL'),
-                      port=os.getenv('REDIS_PORT'),
-                      password=os.getenv('REDIS_PW'), db=0,)
 
+frames = deque(maxlen=100)
+
+# Python interface to redis server
+r = redis_connection()
+
+# pubsub
+p = r.pubsub()
+p.subscribe("game_of_life")
+
+class MyThread(Thread):
+    def run(self):
+        print("Starting thread")
+        for x in p.listen():
+            if x['type'] == 'message':
+                arr = read_from_redis(r, x['data'])
+                frames.append(arr)
+
+thread = MyThread()
+thread.start()
 
 # get data function
-def get(key='A', shape=DEFAULT_SHAPE):
-    out = r.brpop(key, timeout=5)
-    if out is None:
-        return out
-    key, vals = out
-    data = np.fromstring(vals, dtype='<i4').reshape(shape, order='F')
-    return data
+def get():
+    if len(frames) > 0:
+        return frames.popleft()
+    else:
+        return None
 
 
 def make_document(doc):
@@ -46,7 +65,7 @@ def make_document(doc):
     def update():
         global current
 
-        da = get(shape=(200, 200))
+        da = get()
         if da is None:
             da = np.zeros(shape)
 
@@ -75,7 +94,7 @@ def make_document(doc):
     p1d.xaxis.axis_label = 'Time since begining'
     p1d.yaxis.axis_label = '% Alive'
 
-    doc.add_periodic_callback(update, 1)
+    doc.add_periodic_callback(update, 100)
     doc.title = "Streaming Conway's Game of Life"
     doc.add_root(gridplot([[p2d, p1d]]))
 
