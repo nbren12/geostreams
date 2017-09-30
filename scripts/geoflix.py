@@ -26,34 +26,7 @@ current = 0
 
 DEFAULT_SHAPE = (200, 200)
 
-
-
 frames = deque(maxlen=100)
-
-# Python interface to redis server
-r = redis_connection()
-
-# pubsub
-p = r.pubsub()
-p.subscribe("game_of_life")
-
-class MyThread(Thread):
-    def run(self):
-        print("Starting thread")
-        for x in p.listen():
-            if x['type'] == 'message':
-                arr = read_from_redis(r, x['data'])
-                frames.append(arr)
-
-thread = MyThread()
-thread.start()
-
-# get data function
-def get():
-    if len(frames) > 0:
-        return frames.popleft()
-    else:
-        return None
 
 
 def make_document(doc):
@@ -64,22 +37,19 @@ def make_document(doc):
 
     def update():
         global current
+        da = None
+        if len(frames):
+            da, live  = frames.popleft()
+        if da is not None:
+            current += 1
+            s1, s2 = slice(None), slice(None)
+            index = [0, s1, s2]
+            new_data = da.flatten()
+            source2d.patch({'img': [(index, new_data)]})
 
-        da = get()
-        if da is None:
-            da = np.zeros(shape)
-
-        current += 1
-
-        s1, s2 = slice(None), slice(None)
-        index = [0, s1, s2]
-        new_data = da.flatten()
-        source2d.patch({'img': [(index, new_data)]})
-
-        live = new_data.sum()
-        dead = new_data.size - live
-        # print(current, live, dead)
-        source1d.stream({'time': [current], 'live': [live / dead * 100.]})
+            dead = new_data.size - live
+            # print(current, live, dead)
+            source1d.stream({'time': [current], 'live': [live / dead * 100.]})
 
     p2d = figure(plot_width=500, plot_height=500,
                  x_range=(0, shape[0]),
@@ -98,5 +68,30 @@ def make_document(doc):
     doc.title = "Streaming Conway's Game of Life"
     doc.add_root(gridplot([[p2d, p1d]]))
 
+    return update
 
-make_document(curdoc())
+
+update = make_document(curdoc())
+
+# Python interface to redis server
+r = redis_connection()
+
+# pubsub
+p = r.pubsub()
+p.subscribe("game_of_life")
+
+
+source = Stream()
+s = source.filter(lambda x: x['type'] == 'message')\
+          .map(lambda msg: msg['data'])\
+          .map(lambda key: read_from_redis(r, key))\
+          .map(lambda arr: (arr, arr.sum()))\
+          .sink(frames.append)
+
+
+class MyThread(Thread):
+    def run(self):
+        for key in p.listen():
+            source.emit(key)
+
+MyThread().start()
