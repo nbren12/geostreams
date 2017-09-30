@@ -13,7 +13,6 @@ def exe_dir(request):
     rootdir = request.config.rootdir
     return os.path.join(rootdir, "build", "test")
 
-
 def run_project_exe(exe_name, exe_dir=None):
     """Run exe in ./test directory and raise an error if it doesn't run correctly
     """
@@ -26,11 +25,11 @@ def run_project_exe(exe_name, exe_dir=None):
 def test_write_to_redis():
     key = str(uuid.uuid4())
 
-    try:
-        array = numpy.tile(numpy.arange(100).reshape((100, 1)), (1, 200))
-        client.write_to_redis(key, array)
-    finally:
-        with client.gol_connection() as connection:
+    with client.redis_connection() as connection:
+        try:
+            array = numpy.tile(numpy.arange(100).reshape((100, 1)), (1, 200))
+            client.write_to_redis(connection, key, array)
+        finally:
             connection.delete(key)
 
 
@@ -43,8 +42,8 @@ def test_exes(exe_dir, exe):
 @pytest.mark.parametrize("key", ['A-f4', 'A-f8', 'A-i2', 'A-i4'])
 def test_redis_push(exe_dir, key):
     run_project_exe('test_redis_push', exe_dir)
-
-    array = client.read_from_redis(key)
+    with client.redis_connection() as c:
+        array = client.read_from_redis(c, key)
     x, _ = numpy.mgrid[1:201, 1:101]
     if key[-2] == 'f':
         x = x + .5

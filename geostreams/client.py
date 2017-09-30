@@ -6,7 +6,7 @@ import numpy
 
 
 @contextlib.contextmanager
-def gol_connection():
+def redis_connection():
 
     url = os.environ.get('REDIS_URL', "127.0.0.1")
     port = os.environ.get('REDIS_URL', "6379")
@@ -19,37 +19,34 @@ def gol_connection():
                                    password=password)
     yield connection
 
-
 # TODO: use connection.pubsub to get a new array for each new scene sent to the
 # queue
-def read_from_redis(key):
-    with gol_connection() as connection:
-        dimension = connection.hget(key, 'dimensions').decode('utf-8')
-        message = connection.hget(key, 'messages')
-        dtype = connection.hget(key, 'dtype')
+def read_from_redis(connection, key):
+    dimension = connection.hget(key, 'dimensions').decode('utf-8')
+    message = connection.hget(key, 'messages')
+    dtype = connection.hget(key, 'dtype')
 
-        # this is in here for historical reasons
-        if dtype is None:
-            dtype = 'i4'
+    # this is in here for historical reasons
+    if dtype is None:
+        dtype = 'i4'
 
-        x, y = tuple(int(num) for num in dimension.split(','))
-        array = numpy.fromstring(message, dtype=dtype)
-        return array.reshape((x, y), order='F')
+    x, y = tuple(int(num) for num in dimension.split(','))
+    array = numpy.fromstring(message, dtype=dtype)
+    return array.reshape((x, y), order='F')
 
 
-def write_to_redis(key, array):
-    with gol_connection() as connection:
-        data = {
-            'dimension': "%s,%s" % array.shape,
-            'message': array.tostring('F')  # fortran order
-        }
-        connection.lpush(key, data)
+def write_to_redis(connection, key, array):
+    data = {
+        'dimension': "%s,%s" % array.shape,
+        'message': array.tostring('F')  # fortran order
+    }
+    connection.lpush(key, data)
 
 
 # Read from the Game Of Life key/value pair.
 def read_gol():
     from matplotlib import pyplot
-    with gol_connection() as connection:
+    with resid_connection() as connection:
         if connection.exists('A'):
             loaded_array = numpy.fromstring(connection.brpop('A'), dtype='<i4')
             array = loaded_array.reshape((100, 100))
