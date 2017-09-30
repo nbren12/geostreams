@@ -1,11 +1,8 @@
 import os
-import contextlib
-
 import redis
 import numpy
 
 
-@contextlib.contextmanager
 def redis_connection():
 
     url = os.environ.get('REDIS_URL', "127.0.0.1")
@@ -17,10 +14,9 @@ def redis_connection():
                                    port=port,
                                    db=0,
                                    password=password)
-    yield connection
+    return connection
 
-# TODO: use connection.pubsub to get a new array for each new scene sent to the
-# queue
+
 def read_from_redis(connection, key):
     dimension = connection.hget(key, 'dimensions').decode('utf-8')
     message = connection.hget(key, 'messages')

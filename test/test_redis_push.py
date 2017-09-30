@@ -25,12 +25,12 @@ def run_project_exe(exe_name, exe_dir=None):
 def test_write_to_redis():
     key = str(uuid.uuid4())
 
-    with client.redis_connection() as connection:
-        try:
-            array = numpy.tile(numpy.arange(100).reshape((100, 1)), (1, 200))
-            client.write_to_redis(connection, key, array)
-        finally:
-            connection.delete(key)
+    connection =  client.redis_connection()
+    try:
+        array = numpy.tile(numpy.arange(100).reshape((100, 1)), (1, 200))
+        client.write_to_redis(connection, key, array)
+    finally:
+        connection.delete(key)
 
 
 @pytest.mark.parametrize("exe", ['test_connect', 'test_redis_push',
@@ -42,8 +42,8 @@ def test_exes(exe_dir, exe):
 @pytest.mark.parametrize("key", ['A-f4', 'A-f8', 'A-i2', 'A-i4'])
 def test_redis_push(exe_dir, key):
     run_project_exe('test_redis_push', exe_dir)
-    with client.redis_connection() as c:
-        array = client.read_from_redis(c, key)
+    c = client.redis_connection()
+    array = client.read_from_redis(c, key)
     x, _ = numpy.mgrid[1:201, 1:101]
     if key[-2] == 'f':
         x = x + .5
