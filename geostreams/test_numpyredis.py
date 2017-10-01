@@ -23,14 +23,23 @@ class ZictTests(TestCase):
 
         # put string in
         d = Redis(redis.StrictRedis())
-        d['a'] = "1234"
-        assert d['a'] == "1234"
+        d['a'] = b"1234"
+        assert d['a'] == b"1234"
 
         # put seq in
-        d['b'] = ("a", "b", "c")
-        assert tuple(d['b'])  == ("a", "b", "c")
+        d['b'] = (b"a", b"b", b"c")
+        assert tuple(d['b'])  == (b"a", b"b", b"c")
 
         # put dict in
-        di = {"a": "1", "b": "2"}
+        di = {b"a": b"1", b"b": b"2"}
         d["c"] = di
         self.assertDictEqual(d["c"], di)
+
+
+    def test_numpy_redis_mapping(self):
+        d = numpy_redis_mapping()
+        x = np.random.rand(100,100)
+
+        d['x'] = x
+
+        np.testing.assert_equal(d['x'], x)
