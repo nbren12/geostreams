@@ -23,7 +23,6 @@ from threading import Thread
 r = redis_connection()
 
 
-
 # pubsub
 p = r.pubsub()
 p.subscribe("game_of_life")
@@ -34,10 +33,12 @@ s = source.filter(lambda x: x['type'] == 'message')\
           .map(lambda msg: msg['data'])\
           .map(lambda key: read_from_redis(r, key))
 
+
 class MyThread(Thread):
     def run(self):
         for key in p.listen():
             source.emit(key)
+
 
 thread = MyThread()
 import time
@@ -51,7 +52,7 @@ n, m = win.getmaxyx()
 
 def print_gol(data):
     from io import StringIO
-    data = data[:n-1,:m-1]
+    data = data[:n - 1, :m - 1]
     win.clear()
     for i, row in enumerate(data):
         for j, col in enumerate(row):
@@ -59,8 +60,9 @@ def print_gol(data):
                 ch = " "
             else:
                 ch = "x"
-            win.addch(i,j,ch)
+            win.addch(i, j, ch)
     win.refresh()
+
 
 s.sink(print_gol)
 thread.run()
@@ -69,4 +71,3 @@ thread.run()
 # key = next(listener)
 # key = next(listener)
 # from IPython import embed; embed()
-

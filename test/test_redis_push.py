@@ -7,14 +7,17 @@ import numpy.testing
 from geostreams import client
 import pytest
 
+
 @pytest.fixture
 def exe_dir(request):
     rootdir = request.config.rootdir
     return os.path.join(rootdir, "build", "test")
 
+
 @pytest.fixture
 def redis_np_dict():
     return client.numpy_redis_mapping()
+
 
 def run_project_exe(exe_name, exe_dir=None):
     """Run exe in ./test directory and raise an error if it doesn't run correctly
@@ -28,7 +31,7 @@ def run_project_exe(exe_name, exe_dir=None):
 def test_write_to_redis():
     key = str(uuid.uuid4())
 
-    connection =  client.redis_connection()
+    connection = client.redis_connection()
     try:
         array = numpy.tile(numpy.arange(100).reshape((100, 1)), (1, 200))
         client.write_to_redis(connection, key, array)

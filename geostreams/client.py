@@ -13,11 +13,9 @@ def _nested_decode(tree):
 
     while len(stack) > 0:
         item = stack.pop()
-        out  = output.pop()
+        out = output.pop()
         if isinstance(item, Mapping):
             out.append()
-
-
 
 
 class Redis(ZictBase):
@@ -33,7 +31,6 @@ class Redis(ZictBase):
         return self.redis_connection.keys('*')
 
     __iter__ = keys
-
 
     def __len__(self):
         return self.redis_connection.dbsize()
@@ -66,10 +63,9 @@ class Redis(ZictBase):
             raise NotImplementedError(f"Objects of type {value.__class__}"
                                       f"are not supported")
 
-
-
     def __delitem__(self, key):
         self.redis_connection.delete(key)
+
 
 def redis_connection():
 
@@ -119,12 +115,15 @@ def read_gol():
         else:
             print('No key `A`.')
 
+
 def numpy_redis_mapping():
     return Func(arr_to_dict, dict_to_arr, Redis())
+
 
 def redis_dict(r):
     b = Func(r.hmset)
     return Func(r, partial(read_from_redis, r), partial(red))
+
 
 def dict_to_arr(d):
     dimension = d[b'dimensions'].decode("utf-8")
@@ -134,11 +133,11 @@ def dict_to_arr(d):
     array = np.fromstring(message, dtype=dtype)
     return array.reshape((x, y), order='F')
 
+
 def arr_to_dict(arr):
     return {'messages': arr.tostring(order='F'),
             'dtype': arr.__array_interface__['typestr'],
-            'dimensions': ','.join("%d"%n for n in arr.shape)}
-
+            'dimensions': ','.join("%d" % n for n in arr.shape)}
 
 
 def redis_set(r, key, arr):
