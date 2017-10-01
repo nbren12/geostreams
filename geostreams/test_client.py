@@ -2,8 +2,8 @@ from unittest import TestCase
 import numpy as np
 import redis
 
-from .numpyredis import *
-from .client import read_from_redis, Redis
+from .client import (read_from_redis, Redis, numpy_redis_mapping,
+                     redis_set)
 
 
 def test_numpyredis():
