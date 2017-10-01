@@ -1,8 +1,10 @@
-FROM tboquet/bokehviz
+FROM continuumio/miniconda
 
-RUN pip install xarray redis
+ADD environment.yml environment.yml
+RUN conda env create environment.yml
+
 
 #ADD geoflix.py /app/geoflix.py
-EXPOSE 8889
-
-CMD bokeh serve --log-level=debug --show --port=8889 --allow-websocket-origin="*" /app/geoflix.py
+WORKDIR /app
+CMD /bin/bash -c "source activate geostreams && python setup.py develop &&\
+                  bokeh serve --log-level=debug --port=8889 --allow-websocket-origin="*" scripts/geoflix.py"

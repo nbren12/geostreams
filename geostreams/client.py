@@ -6,7 +6,7 @@ import numpy
 def redis_connection():
 
     url = os.environ.get('REDIS_URL', "127.0.0.1")
-    port = os.environ.get('REDIS_URL', "6379")
+    port = os.environ.get('REDIS_PORT', "6379")
     password = os.environ.get('REDIS_PW', None)
 
     print(f'Connecting to redis server at {url}:{port}')

@@ -9,7 +9,7 @@ RUN apt-get install -y cmake
 #ADD src /gameoflife/src
 #ADD test /gameoflife/test
 
-CMD cd /gameoflife/ && make build && \
-    /bin/bash -c "echo 3 | ./game_of_life"
+CMD cd /app/ && make build && \
+    /bin/bash -c "./build/test/game_of_life"
 
 

@@ -3,12 +3,12 @@ services:
   bokeh:
     build: ./scripts/
     ports:
-      - "8889:8889"
+        - "8889:8889"
     environment:
       - REDIS_PORT=6379
       - REDIS_URL=redis
     volumes:
-      - ./scripts:/app
+      - ./:/app
     depends_on:
       - redis
       - game_of_life
@@ -20,7 +20,7 @@ services:
     depends_on:
       - redis
     volumes:
-      - ./:/gameoflife
+      - ./:/app
   redis:
     image: redis:latest
     ports:
