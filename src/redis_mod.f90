@@ -15,7 +15,7 @@ module redis_mod
      subroutine redis_test_set(c) bind(c, name='redisTestSet')
        use iso_c_binding
        ! Arguments
-       type(c_ptr), VALUE :: c
+       type(c_ptr), value :: c
      end subroutine redis_test_set
 
      type(c_ptr) function setup_connection() bind(c, name='setupConnection')
@@ -25,36 +25,36 @@ module redis_mod
      subroutine free_connection(c) bind(c, name='redisFree')
        use iso_c_binding
        ! Arguments
-       type(c_ptr), VALUE :: c
+       type(c_ptr), value :: c
      end subroutine free_connection
 
      subroutine c_redis_push(c, key, arr, dtype, dims, ndims) &
           bind(c, name='Redis_push')
        use iso_c_binding
        ! Arguments
-       type(c_ptr), VALUE    :: c, arr
+       type(c_ptr), value    :: c, arr
        character(c_char)     :: dtype(*), key(*)
-       integer(c_int), VALUE :: ndims
+       integer(c_int), value :: ndims
        integer(c_int)        :: dims(ndims)
      end subroutine c_redis_push
 
      function c_redis_incr(c, key) result(y) bind(c, name='Redis_incr')
        use iso_c_binding
-       type(c_ptr), VALUE    :: c
+       type(c_ptr), value    :: c
        character(c_char)     :: key(*)
        integer(c_long_long) :: y
      end function c_redis_incr
 
      function c_redis_uniq(c) result(y) bind(c, name='Redis_uniq')
        use iso_c_binding
-       type(c_ptr), VALUE    :: c
+       type(c_ptr), value    :: c
        integer(c_long_long) :: y
      end function c_redis_uniq
 
      subroutine c_redis_pub(c, channel, key) &
           bind(c, name='Redis_pub')
        use iso_c_binding
-       type(c_ptr), VALUE    :: c
+       type(c_ptr), value    :: c
        character(c_char)     :: channel(*), key(*)
      end subroutine c_redis_pub
 
@@ -65,7 +65,7 @@ module redis_mod
           redis_push_f8_1d, redis_push_f8_2d, redis_push_f8_3d, &
           redis_push_i2_1d, redis_push_i2_2d, redis_push_i2_3d, &
           redis_push_i4_1d, redis_push_i4_2d, redis_push_i4_3d
-  end interface
+  end interface redis_push
 
 contains
 

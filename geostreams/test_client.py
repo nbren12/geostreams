@@ -9,7 +9,7 @@ from .client import (read_from_redis, Redis, numpy_redis_mapping,
 def test_numpyredis():
     r = redis.StrictRedis()
 
-    x = np.random.rand(100,100)
+    x = np.random.rand(100, 100)
 
     redis_set(r, "x", x)
     y = read_from_redis(r, "x")
@@ -28,17 +28,16 @@ class ZictTests(TestCase):
 
         # put seq in
         d['b'] = (b"a", b"b", b"c")
-        assert tuple(d['b'])  == (b"a", b"b", b"c")
+        assert tuple(d['b']) == (b"a", b"b", b"c")
 
         # put dict in
         di = {b"a": b"1", b"b": b"2"}
         d["c"] = di
         self.assertDictEqual(d["c"], di)
 
-
     def test_numpy_redis_mapping(self):
         d = numpy_redis_mapping()
-        x = np.random.rand(100,100)
+        x = np.random.rand(100, 100)
 
         d['x'] = x
 

@@ -39,7 +39,7 @@ def make_document(doc):
         global current
         da = None
         if len(frames):
-            da, live  = frames.popleft()
+            da, live = frames.popleft()
         if da is not None:
             current += 1
             s1, s2 = slice(None), slice(None)
@@ -93,5 +93,6 @@ class MyThread(Thread):
     def run(self):
         for key in p.listen():
             source.emit(key)
+
 
 MyThread().start()
