@@ -4,6 +4,7 @@ import redis
 import numpy
 from zict.common import ZictBase
 
+
 def _nested_decode(tree):
     # TODO
     stack = [tree]
@@ -20,8 +21,11 @@ def _nested_decode(tree):
 
 class Redis(ZictBase):
 
-    def __init__(self, r: redis.StrictRedis):
+    def __init__(self, r: redis.StrictRedis = None):
         "docstring"
+        if r is None:
+            r = redis_connection()
+
         self.redis_connection = r
 
     def keys(self):
@@ -36,40 +40,35 @@ class Redis(ZictBase):
     def __getitem__(self, key):
         key_type = self.redis_connection.type(key).decode("utf-8")
         if key_type == 'string':
-            return self.redis_connection.get(key)\
-                       .decode("utf-8")
+            return self.redis_connection.get(key)
         elif key_type == 'list':
-            return [x.decode("utf-8") for x in
-                    self.redis_connection.lrange(key, 0, -1)]
+            return self.redis_connection.lrange(key, 0, -1)
         elif key_type == 'hash':
-            d =  self.redis_connection.hgetall(key)
-            return {k.decode("utf-8"): v.decode("utf-8")
-                    for k,v in d.items()}
+            return self.redis_connection.hgetall(key)
 
     def __setitem__(self, key, value):
 
         del self[key]
 
         # insert strings as strings
-        if isinstance(value, str):
+        if isinstance(value, bytes):
             self.redis_connection.set(key, value)
-            return
-
         # insert dicts as hashes
-        if isinstance(value, Mapping):
+        elif isinstance(value, Mapping):
             for k, v in value.items():
                 self.redis_connection.hset(key, k, v)
 
         elif isinstance(value, Iterable):
             for item in value:
                 self.redis_connection.rpush(key, item)
+        else:
+            raise NotImplementedError(f"Objects of type {value.__class__}"
+                                      f"are not supported")
 
 
 
     def __delitem__(self, key):
         self.redis_connection.delete(key)
-
-
 
 def redis_connection():
 
