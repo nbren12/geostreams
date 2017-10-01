@@ -10,3 +10,6 @@ dependencies:
 - pytest
 - autopep8
 - streamz
+- pip
+- zict
+- jedi
