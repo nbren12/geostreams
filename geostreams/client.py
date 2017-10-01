@@ -1,6 +1,74 @@
 import os
+from collections import Mapping, Iterable
 import redis
 import numpy
+from zict.common import ZictBase
+
+def _nested_decode(tree):
+    # TODO
+    stack = [tree]
+    output = [[]]
+
+    while len(stack) > 0:
+        item = stack.pop()
+        out  = output.pop()
+        if isinstance(item, Mapping):
+            out.append()
+
+
+
+
+class Redis(ZictBase):
+
+    def __init__(self, r: redis.StrictRedis):
+        "docstring"
+        self.redis_connection = r
+
+    def keys(self):
+        return self.redis_connection.keys('*')
+
+    __iter__ = keys
+
+
+    def __len__(self):
+        return self.redis_connection.dbsize()
+
+    def __getitem__(self, key):
+        key_type = self.redis_connection.type(key).decode("utf-8")
+        if key_type == 'string':
+            return self.redis_connection.get(key)\
+                       .decode("utf-8")
+        elif key_type == 'list':
+            return [x.decode("utf-8") for x in
+                    self.redis_connection.lrange(key, 0, -1)]
+        elif key_type == 'hash':
+            d =  self.redis_connection.hgetall(key)
+            return {k.decode("utf-8"): v.decode("utf-8")
+                    for k,v in d.items()}
+
+    def __setitem__(self, key, value):
+
+        del self[key]
+
+        # insert strings as strings
+        if isinstance(value, str):
+            self.redis_connection.set(key, value)
+            return
+
+        # insert dicts as hashes
+        if isinstance(value, Mapping):
+            for k, v in value.items():
+                self.redis_connection.hset(key, k, v)
+
+        elif isinstance(value, Iterable):
+            for item in value:
+                self.redis_connection.rpush(key, item)
+
+
+
+    def __delitem__(self, key):
+        self.redis_connection.delete(key)
+
 
 
 def redis_connection():
