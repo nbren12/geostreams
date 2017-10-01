@@ -1,7 +1,8 @@
 import os
 from collections import Mapping, Iterable
 import redis
-import numpy
+import numpy as np
+from zict import Func
 from zict.common import ZictBase
 
 
@@ -94,7 +95,7 @@ def read_from_redis(connection, key):
         dtype = 'i4'
 
     x, y = tuple(int(num) for num in dimension.split(','))
-    array = numpy.fromstring(message, dtype=dtype)
+    array = np.fromstring(message, dtype=dtype)
     return array.reshape((x, y), order='F')
 
 
@@ -111,9 +112,34 @@ def read_gol():
     from matplotlib import pyplot
     with resid_connection() as connection:
         if connection.exists('A'):
-            loaded_array = numpy.fromstring(connection.brpop('A'), dtype='<i4')
+            loaded_array = np.fromstring(connection.brpop('A'), dtype='<i4')
             array = loaded_array.reshape((100, 100))
             pyplot.imshow(array)
             pyplot.savefig('scene.png')
         else:
             print('No key `A`.')
+
+def numpy_redis_mapping():
+    return Func(arr_to_dict, dict_to_arr, Redis())
+
+def redis_dict(r):
+    b = Func(r.hmset)
+    return Func(r, partial(read_from_redis, r), partial(red))
+
+def dict_to_arr(d):
+    dimension = d[b'dimensions'].decode("utf-8")
+    message = d[b'messages']
+    dtype = d[b'dtype']
+    x, y = tuple(int(num) for num in dimension.split(','))
+    array = np.fromstring(message, dtype=dtype)
+    return array.reshape((x, y), order='F')
+
+def arr_to_dict(arr):
+    return {'messages': arr.tostring(order='F'),
+            'dtype': arr.__array_interface__['typestr'],
+            'dimensions': ','.join("%d"%n for n in arr.shape)}
+
+
+
+def redis_set(r, key, arr):
+    r.hmset(key, arr_to_dict(arr))
