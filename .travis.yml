@@ -4,7 +4,7 @@ branches:
 language: python
 python:
   - "3.6"
-install:
+before_install:
   - sudo apt-get -qq update
   - sudo apt-get -y install gfortran mpich gcc make libhiredis-dev cmake
   - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
@@ -15,7 +15,7 @@ install:
   - conda update -q conda
   # Useful for debugging any issues with conda
   - conda info -a
-  # load environment.yml
+install:
   - conda env create environment.yml
   - source activate geostreams
   - make build
@@ -23,5 +23,6 @@ install:
 services:
   - redis-server
 script:
-  - pytest -v --pyargs geostreams
-  - pytest -v test
+  - which py.test
+  - py.test -v geostreams
+  - py.test -v test
