@@ -23,4 +23,5 @@ install:
 services:
   - redis-server
 script:
-  - pytest
+  - pytest -v --pyargs geostreams
+  - pytest -v test
