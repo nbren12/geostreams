@@ -17,28 +17,26 @@ def test_numpyredis():
     np.testing.assert_equal(x, y)
 
 
-class ZictTests(TestCase):
+def test_zict_redis():
 
-    def test_zict_redis(self):
+    # put string in
+    d = Redis(redis.StrictRedis())
+    d['a'] = b"1234"
+    assert d['a'] == b"1234"
 
-        # put string in
-        d = Redis(redis.StrictRedis())
-        d['a'] = b"1234"
-        assert d['a'] == b"1234"
+    # put seq in
+    d['b'] = (b"a", b"b", b"c")
+    assert tuple(d['b']) == (b"a", b"b", b"c")
 
-        # put seq in
-        d['b'] = (b"a", b"b", b"c")
-        assert tuple(d['b']) == (b"a", b"b", b"c")
+    # put dict in
+    di = {b"a": b"1", b"b": b"2"}
+    d["c"] = di
+    assert d["c"] ==  di
 
-        # put dict in
-        di = {b"a": b"1", b"b": b"2"}
-        d["c"] = di
-        self.assertDictEqual(d["c"], di)
+def test_numpy_redis_mapping():
+    d = numpy_redis_mapping()
+    x = np.random.rand(100, 100)
 
-    def test_numpy_redis_mapping(self):
-        d = numpy_redis_mapping()
-        x = np.random.rand(100, 100)
+    d['x'] = x
 
-        d['x'] = x
-
-        np.testing.assert_equal(d['x'], x)
+    np.testing.assert_equal(d['x'], x)

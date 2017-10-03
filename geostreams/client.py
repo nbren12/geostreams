@@ -46,7 +46,7 @@ class Redis(ZictBase):
 
     def __setitem__(self, key, value):
 
-        del self[key]
+        self.redis_connection.delete(key)
 
         # insert strings as strings
         if isinstance(value, bytes):
@@ -64,7 +64,9 @@ class Redis(ZictBase):
                                       f"are not supported")
 
     def __delitem__(self, key):
-        self.redis_connection.delete(key)
+        err = self.redis_connection.delete(key)
+        if err == 0:
+            raise KeyError
 
 
 def redis_connection():
