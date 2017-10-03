@@ -31,7 +31,8 @@ def test_zict_redis():
     # put dict in
     di = {b"a": b"1", b"b": b"2"}
     d["c"] = di
-    assert d["c"] ==  di
+    assert d["c"] == di
+
 
 def test_numpy_redis_mapping():
     d = numpy_redis_mapping()
