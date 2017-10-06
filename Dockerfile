@@ -8,8 +8,10 @@ RUN apt-get install -y cmake
 #ADD game_of_life /gameoflife/game_of_life
 #ADD src /gameoflife/src
 #ADD test /gameoflife/test
+ADD ./ /app
+RUN cd /app && make build
 
-CMD cd /app/ && make build && \
-    /bin/bash -c "./build/test/game_of_life"
+WORKDIR /app
+CMD /bin/bash -c "./build/test/game_of_life"
 
 

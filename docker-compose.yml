@@ -19,8 +19,6 @@ services:
       - REDIS_URL=redis
     depends_on:
       - redis
-    volumes:
-      - ./:/app
   redis:
     image: redis:latest
     ports:
