@@ -6,9 +6,11 @@ Instructions
 ============
 
 Download extract and patch the test case using
+
     make
 
 Then run it using 
+
     ./run.sh
 
 Behind the scenes, this run script runs a docker image for ICAR available on
