@@ -1,0 +1,17 @@
+This directory shows to examples of how to call a cython function from C.
+
+The [cython
+documentation](http://docs.cython.org/en/latest/src/userguide/external_C_code.html#using-cython-declarations-from-c)
+describes two ways to do this.
+    
+    cdef public func():
+        pass
+
+and 
+
+    cdef api func():
+        pass
+
+Since the documentation was a little vague. I have written two examples here.
+
+The difference between `api` and `public` seems to be that the source generated for `public` functions must be explicitly included in the target executable. On the other hand, `api` provides an importing mechanism, so the C or fortran executables only need to include the header `cython_name_api.h` and link against the system python library.

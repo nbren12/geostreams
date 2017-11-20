@@ -1,0 +1,8 @@
+For some reason this example fails with 
+
+	> ./sample
+	Today is Sun Nov 19 17:47:53 2017
+	fish: './sample' terminated by signal SIGSEGV (Address boundary error)
+	> bash
+
+when it is run with the `fish` shell. It works in `bash`.

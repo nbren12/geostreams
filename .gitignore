@@ -214,3 +214,13 @@ compile_commands.json
 CTestTestfile.cmake
 .idea/
 /examples/icar/example
+/test/cython/api/delorean.c
+/test/cython/api/delorean.h
+/test/cython/api/delorean_api.h
+/test/cython/api/main
+/test/cython/public/cython_hook.h
+/test/cython/public/test
+/test/cython_hook.c
+/test/cython_hook.h
+/test/cython_hook.html
+/test/cython_hook_api.h

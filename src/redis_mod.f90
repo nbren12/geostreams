@@ -5,6 +5,14 @@ module redis_mod
   character(len=1), parameter :: nullchar=char(0)
 
   interface
+     subroutine pyinit() bind(c, name='Py_Initialize')
+     end subroutine pyinit
+
+     subroutine pyfin() bind(c, name='Py_Finalize')
+     end subroutine pyfin
+
+     subroutine cython_hook() bind(c)
+     end subroutine cython_hook
 
      function usleep(n) bind(c)
        use iso_c_binding
